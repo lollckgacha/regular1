@@ -6,10 +6,15 @@
     <title>REGULAR1 SEASON2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700;900&family=Exo+2:wght@300;600;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Titillium+Web:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <script src="app.js" defer></script>
 </head>
 <body>
@@ -60,7 +65,7 @@
         </section>
 
         <section id="view-pre-quali" class="view-section">
-    </section>
+            </section>
 
         <section id="view-main" class="view-section">
             <div class="tab-group" id="main-track-tabs"></div>
@@ -74,9 +79,6 @@
         </section>
 
         <section id="view-standings" class="view-section">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <img src="images/logo.png" class="section-deco-logo" alt="Logo">
-            </div>
             <div class="track-header-card" style="padding:20px; justify-content:center; min-height:auto; flex-direction:column; gap:15px;">
                 <h2 class="track-name-title">종합 순위</h2>
                 <div class="standings-type-nav">
@@ -85,12 +87,8 @@
                 </div>
                 <div class="standings-round-nav" id="standings-round-btns"></div>
             </div>
-            <table class="f1-table">
-                <thead>
-                    <tr id="standings-header-row"></tr>
-                </thead>
-                <tbody id="standings-list"></tbody>
-            </table>
+            
+            <div id="standings-wrapper" class="unified-glass-box" style="background:transparent; box-shadow:none; padding:0;"></div>
         </section>
 
         <section id="view-podium" class="view-section">
@@ -118,10 +116,10 @@
             if ((e.ctrlKey || e.metaKey) && ((e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j')) || (e.key === 'U' || e.key === 'u'))) { e.preventDefault(); return false; }
         });
     </script>
+
     <div class="maker-badge">
         Made by <strong>SSG_랜더스</strong>
     </div>
 
 </body>
 </html>
-
