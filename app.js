@@ -496,7 +496,6 @@ function renderPlayersGrid() {
         return; 
     } 
     
-    // 팀별로 선수 분류
     const teamsMap = {}; 
     playersList.forEach(p => { 
         if (!p.team) p.team = "FA"; 
@@ -504,7 +503,6 @@ function renderPlayersGrid() {
         teamsMap[p.team].push(p); 
     }); 
     
-    // 팀 이름 정렬 (FA는 마지막)
     const sortedTeamNames = Object.keys(teamsMap).sort((a, b) => { 
         if (a === 'FA') return 1; 
         if (b === 'FA') return -1; 
@@ -518,26 +516,15 @@ function renderPlayersGrid() {
         const cardStyle = `background: linear-gradient(135deg, ${teamColor}dd 0%, #111 80%); border-color: ${teamColor};`; 
         const headerStyle = `color: ${teamColor}; filter: brightness(1.5);`; 
         
-        const membersHTML = teamMembers.map(member => {
-            // [핵심 변경 사항]
-            // 데이터에 link가 있는지 확인하고, 있으면 클릭 이벤트와 손가락 커서를 추가합니다.
-            const hasLink = member.link && member.link.trim() !== '';
-            const clickAction = hasLink ? `onclick="window.open('${member.link}', '_blank')"` : '';
-            const cursorStyle = hasLink ? 'cursor: pointer;' : '';
-            const hoverTitle = hasLink ? `title="${member.name} 방송국 가기"` : '';
-
-            return `<div class="player-card-box">
-                <img src="${member.img || 'images/logo.png'}" 
-                     class="player-photo-large" 
-                     style="border-color: ${teamColor}; ${cursorStyle}" 
-                     ${clickAction}
-                     ${hoverTitle}
-                     onerror="this.src='images/logo.png'">
+        // [수정] style="border-color: ${teamColor};" 추가
+        const membersHTML = teamMembers.map(member => 
+            `<div class="player-card-box">
+                <img src="${member.img || 'images/logo.png'}" class="player-photo-large" style="border-color: ${teamColor};" onerror="this.src='images/logo.png'">
                 <div class="player-info-box">
                     <span class="player-name-large">${member.name}</span>
                 </div>
-            </div>`;
-        }).join(''); 
+            </div>`
+        ).join(''); 
         
         htmlOutput += `<div class="team-card" style="${cardStyle}"><div class="team-name-header team-text-stroke" style="${headerStyle}">${teamName}</div><div class="team-players-row">${membersHTML}</div></div>`; 
     }); 
@@ -567,6 +554,3 @@ function renderPreQuali() {
         </tr>`; 
     }).join(''); 
 }
-
-
-
