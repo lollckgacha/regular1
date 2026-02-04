@@ -496,6 +496,7 @@ function renderPlayersGrid() {
         return; 
     } 
     
+    // 팀별로 선수 분류
     const teamsMap = {}; 
     playersList.forEach(p => { 
         if (!p.team) p.team = "FA"; 
@@ -503,6 +504,7 @@ function renderPlayersGrid() {
         teamsMap[p.team].push(p); 
     }); 
     
+    // 팀 이름 정렬 (FA는 마지막)
     const sortedTeamNames = Object.keys(teamsMap).sort((a, b) => { 
         if (a === 'FA') return 1; 
         if (b === 'FA') return -1; 
@@ -517,7 +519,8 @@ function renderPlayersGrid() {
         const headerStyle = `color: ${teamColor}; filter: brightness(1.5);`; 
         
         const membersHTML = teamMembers.map(member => {
-            // [추가 로직] 링크가 있으면 클릭 이벤트와 커서 스타일 추가
+            // [핵심 변경 사항]
+            // 데이터에 link가 있는지 확인하고, 있으면 클릭 이벤트와 손가락 커서를 추가합니다.
             const hasLink = member.link && member.link.trim() !== '';
             const clickAction = hasLink ? `onclick="window.open('${member.link}', '_blank')"` : '';
             const cursorStyle = hasLink ? 'cursor: pointer;' : '';
@@ -564,5 +567,6 @@ function renderPreQuali() {
         </tr>`; 
     }).join(''); 
 }
+
 
 
