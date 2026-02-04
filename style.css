@@ -431,7 +431,7 @@ nav {
     transform: translateY(-2px); /* 살짝 위로 이동 */
 }
 
-.maker-badge strong {
+.maker-badge strong {  
     color: #fff; 
     margin-left: 3px;
 }
