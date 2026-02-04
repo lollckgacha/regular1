@@ -14,6 +14,10 @@ let appData = {
 };
 
 const TRACK_ORDER = ["레드불링", "상파울루", "라스베가스", "아부다비"];
+const TEAM_ORDER_LIST = [
+    "맥라렌", "메르세데스", "레드불", "페라리", "윌리엄스", 
+    "레이싱불스", "애스턴마틴", "하스", "킥자우버", "알핀"
+];
 
 const DEFAULT_COLORS = { "FER": "#E8002D", "MCL": "#FF8700", "RBR": "#3671C6", "MER": "#27F4D2", "AMR": "#229971", "ALP": "#0093CC", "WIL": "#64C4FF", "VCARB": "#6692FF", "KICK": "#52E252", "HAS": "#B6BABD", "FA": "#555555" };
 const DEFAULT_TEAM_COLOR = "#555555";
@@ -496,7 +500,6 @@ function renderPlayersGrid() {
         return; 
     } 
     
-    // 팀별 데이터 정리
     const teamsMap = {}; 
     playersList.forEach(p => { 
         if (!p.team) p.team = "FA"; 
@@ -504,29 +507,33 @@ function renderPlayersGrid() {
         teamsMap[p.team].push(p); 
     }); 
     
-    // 팀 이름 정렬 (FA는 맨 뒤로)
+    // [수정] 팀 이름 정렬 로직 (TEAM_ORDER_LIST 기준)
     const sortedTeamNames = Object.keys(teamsMap).sort((a, b) => { 
-        if (a === 'FA') return 1; 
-        if (b === 'FA') return -1; 
-        return a.localeCompare(b); 
+        const idxA = TEAM_ORDER_LIST.indexOf(a);
+        const idxB = TEAM_ORDER_LIST.indexOf(b);
+
+        // FA는 항상 맨 뒤로
+        if (a === 'FA') return 1;
+        if (b === 'FA') return -1;
+        
+        // 리스트에 없는 팀은 뒤로 보냄
+        if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+        if (idxA === -1) return 1;
+        if (idxB === -1) return -1;
+        
+        return idxA - idxB;
     }); 
     
     let htmlOutput = ''; 
-    
     sortedTeamNames.forEach(teamName => { 
         const teamMembers = teamsMap[teamName]; 
         const teamColor = getTeamColor(teamName); 
         
-        // [디자인 유지] 기존의 진한 배경과 헤더 스타일 그대로 사용
         const cardStyle = `background: linear-gradient(135deg, ${teamColor}dd 0%, #111 80%); border-color: ${teamColor};`; 
         const headerStyle = `color: ${teamColor}; filter: brightness(1.5);`; 
         
         const membersHTML = teamMembers.map(member => {
-            // [디자인 유지] 이미지의 팀 컬러 테두리 스타일 유지
             const imgHTML = `<img src="${member.img || 'images/logo.png'}" class="player-photo-large" style="border-color: ${teamColor};" onerror="this.src='images/logo.png'">`;
-
-            // [기능 추가] URL이 있으면 클릭 가능한 링크(a)로 감싸고, 없으면 div로 감싸기
-            // (player-img-wrapper 클래스는 마우스 호버 효과를 위해 사용됨)
             const contentHTML = member.url 
                 ? `<a href="${member.url}" target="_blank" class="player-img-wrapper">${imgHTML}</a>`
                 : `<div class="player-img-wrapper">${imgHTML}</div>`;
@@ -537,7 +544,7 @@ function renderPlayersGrid() {
                     <span class="player-name-large">${member.name}</span>
                 </div>
             </div>`;
-        }).join('');   
+        }).join(''); 
         
         htmlOutput += `<div class="team-card" style="${cardStyle}"><div class="team-name-header team-text-stroke" style="${headerStyle}">${teamName}</div><div class="team-players-row">${membersHTML}</div></div>`; 
     }); 
