@@ -190,7 +190,7 @@ function renderPreQuali() {
         }).join('');
     };
 
-    const tableHeader = `<thead><tr><th>순위</th><th>드라이버</th><th>성별</th><th>기록</th><th>차이</th><th>파트너</th><th>팀</th></tr></thead>`;
+    const tableHeader = `<thead><tr><th>순위</th><th>드라이버</th><th>성별</th><th>기록</th><th>차이</th><th>팀메이트</th><th>팀</th></tr></thead>`;
 
     container.innerHTML = `
         <div class="track-header-card" style="padding:15px; margin-bottom:15px; min-height:auto;">
@@ -626,7 +626,7 @@ window.switchTab = (tabId, isFromHistory = false) => {
     if (targetBtn) targetBtn.classList.add('active');
 
     if (!isFromHistory) {
-        history.pushState({ tab: tabId }, '', `#${tabId}`);
+        history.pushState({ tab: tabId }, '', `#${tabId}`);  
     }
 
     if (tabId === 'players') renderPlayersGrid();
