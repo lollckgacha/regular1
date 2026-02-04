@@ -92,20 +92,22 @@
         </section>
 
         <section id="view-podium" class="view-section">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <img src="images/logo.png" class="section-deco-logo" alt="Logo"> 
-            </div>
-            <h2 style="text-align:center; margin-bottom:20px; color:var(--primary-mint); font-family:'Chakra Petch';">포디움</h2>
-            <div style="text-align:center; margin-bottom:30px;">
-                <div class="standings-type-nav" style="justify-content:center;">
-                    <button class="type-btn active" id="podium-btn-driver" onclick="setPodiumType('driver')">드라이버</button>
-                    <button class="type-btn" id="podium-btn-constructor" onclick="setPodiumType('constructor')">컨스트럭터</button>
-                </div>
-            </div>
-            <div id="podium-display-area" class="podium-wrap">
-                <p style="text-align:center; color:#888;">데이터를 불러오는 중입니다...</p>
-            </div>
-        </section>
+    <div style="text-align: center; margin-bottom: 10px;">
+        <img src="images/logo.png" class="section-deco-logo" alt="Logo"> 
+    </div>
+    
+    <div class="split-layout-container" style="align-items: stretch;">
+        <div class="split-table-box" style="text-align:center; padding-top:20px;">
+            <h2 style="color:var(--primary-mint); font-family:var(--font-main); margin-bottom:20px;">드라이버 챔피언</h2>
+            <div id="podium-driver-area" class="podium-container compact-podium"></div>
+        </div>
+
+        <div class="split-table-box" style="text-align:center; padding-top:20px;">
+            <h2 style="color:var(--primary-mint); font-family:var(--font-main); margin-bottom:20px;">컨스트럭터 챔피언</h2>
+            <div id="podium-constructor-area" class="podium-container compact-podium"></div>
+        </div>
+    </div>
+</section>
 
     </div>  
 
