@@ -210,7 +210,18 @@ function renderMainQuali(track, container) {
                 ${listData.length === 0 ? '<tr><td colspan="6" style="padding:30px;">데이터 없음</td></tr>' : 
                   listData.map(p => { 
                       const tColor = getTeamColor(p.team); 
-                      return `<tr><td><span class="rank-num rank-${p.rank}">${p.rank}</span></td><td><div class="cell-left"><img src="${p.img || 'images/logo.png'}" class="p-avatar" onerror="this.src='images/logo.png'"><span style="font-weight:bold;">${p.name}</span></div></td><td>${p.gender}</td><td class="team-text-stroke" style="color:${tColor}; font-weight:900;">${p.team}</td><td class="record-time">${p.record}</td><td class="gap-time">${p.gap}</td></tr>`;
+                      // [수정] style="border-color: ${tColor};" 추가
+                      return `<tr>
+                          <td><span class="rank-num rank-${p.rank}">${p.rank}</span></td>
+                          <td><div class="cell-left">
+                              <img src="${p.img || 'images/logo.png'}" class="p-avatar" style="border-color: ${tColor};" onerror="this.src='images/logo.png'">
+                              <span style="font-weight:bold;">${p.name}</span>
+                          </div></td>
+                          <td>${p.gender}</td>
+                          <td class="team-text-stroke" style="color:${tColor}; font-weight:900;">${p.team}</td>
+                          <td class="record-time">${p.record}</td>
+                          <td class="gap-time">${p.gap}</td>
+                      </tr>`;
                   }).join('')}
             </tbody>
         </table>
@@ -253,7 +264,23 @@ function renderMainRace(track, container) {
                         const qualiRecord = qualiData.find(q => q.name === p.name);
                         const gridPos = qualiRecord ? qualiRecord.rank : '-';
                         
-                        return `<tr><td><span class="rank-num rank-${p.rank}">${p.rank}</span></td><td><div class="cell-left"><img src="${p.img || 'images/logo.png'}" class="p-avatar" onerror="this.src='images/logo.png'"><span style="font-weight:bold;">${p.name}</span></div></td><td>${p.gender}</td><td><span class="badge ${badgeClass}">${p.state}</span></td><td class="team-text-stroke" style="font-weight:900; color:${tColor};">${p.team}</td><td class="record-time">${p.totalTime}</td><td class="penalty-time">${p.penalty}</td><td class="gap-time">${p.gap}</td><td style="color:var(--primary-mint); font-weight:900;">+${p.points}</td><td style="font-weight:bold; color:white;">${p.cumulativePoints}</td><td style="color:#aaa; font-weight:bold; font-size:1.1rem;">${gridPos}</td></tr>`;
+                        // [수정] style="border-color: ${tColor};" 추가
+                        return `<tr>
+                            <td><span class="rank-num rank-${p.rank}">${p.rank}</span></td>
+                            <td><div class="cell-left">
+                                <img src="${p.img || 'images/logo.png'}" class="p-avatar" style="border-color: ${tColor};" onerror="this.src='images/logo.png'">
+                                <span style="font-weight:bold;">${p.name}</span>
+                            </div></td>
+                            <td>${p.gender}</td>
+                            <td><span class="badge ${badgeClass}">${p.state}</span></td>
+                            <td class="team-text-stroke" style="font-weight:900; color:${tColor};">${p.team}</td>
+                            <td class="record-time">${p.totalTime}</td>
+                            <td class="penalty-time">${p.penalty}</td>
+                            <td class="gap-time">${p.gap}</td>
+                            <td style="color:var(--primary-mint); font-weight:900;">+${p.points}</td>
+                            <td style="font-weight:bold; color:white;">${p.cumulativePoints}</td>
+                            <td style="color:#aaa; font-weight:bold; font-size:1.1rem;">${gridPos}</td>
+                        </tr>`;
                     }).join('')}
                 </tbody>
             </table>
@@ -263,29 +290,176 @@ function renderMainRace(track, container) {
 }
 
 // =========================================================
-// 종합 순위 & 포디움 등 기타 로직 (기존 코드 유지)
+// 종합 순위 & 포디움 등 기타 로직
 // =========================================================
-// ... (renderStandings, calculatePointsUntil, setStandingsType, setStandingsRound, renderPodium, renderPlayersGrid, renderPreQuali 함수들은 그대로 둡니다) ...
-// (아래는 편의상 붙여넣을 수 있게 생략된 함수들을 다시 포함합니다.)
 
-window.setStandingsType = (type) => { /* ... 기존과 동일 ... */ 
-    currentStandingsView.type = type; document.querySelectorAll('.standings-type-nav .type-btn').forEach(b => b.classList.remove('active')); document.querySelector(`.standings-type-nav .type-btn[onclick*="${type}"]`).classList.add('active'); renderStandings(); 
+window.setStandingsType = (type) => { 
+    currentStandingsView.type = type; 
+    document.querySelectorAll('.standings-type-nav .type-btn').forEach(b => b.classList.remove('active')); 
+    document.querySelector(`.standings-type-nav .type-btn[onclick*="${type}"]`).classList.add('active'); 
+    renderStandings(); 
 };
-window.setStandingsRound = (idx) => { /* ... 기존과 동일 ... */ 
-    currentStandingsView.roundIndex = parseInt(idx); renderStandings(); 
+
+window.setStandingsRound = (idx) => { 
+    currentStandingsView.roundIndex = parseInt(idx); 
+    renderStandings(); 
 };
-function renderStandings() { /* ... 기존과 동일 ... */ 
-    const container = document.getElementById('standings-list'); const headerRow = document.getElementById('standings-header-row'); const roundNav = document.getElementById('standings-round-btns'); if (!container) return; const availableTracks = TRACK_ORDER.filter(t => appData.mainRace[t] && appData.mainRace[t].length > 0); const roundCount = availableTracks.length; let navHTML = availableTracks.map((t, i) => `<button class="round-btn ${currentStandingsView.roundIndex === i ? 'active' : ''}" onclick="setStandingsRound(${i})">${t}</button>`).join(''); navHTML += `<button class="round-btn ${currentStandingsView.roundIndex === -1 ? 'active' : ''}" onclick="setStandingsRound(-1)">최종순위</button>`; roundNav.innerHTML = navHTML; let targetIdx = currentStandingsView.roundIndex === -1 ? roundCount - 1 : currentStandingsView.roundIndex; if (targetIdx < 0) targetIdx = -1; let currentData = calculatePointsUntil(targetIdx, currentStandingsView.type); let prevData = null; if (currentStandingsView.roundIndex !== -1 && targetIdx > 0) { prevData = calculatePointsUntil(targetIdx - 1, currentStandingsView.type); } if (currentStandingsView.type === 'driver') { headerRow.innerHTML = `<th width="10%">순위</th><th width="40%">드라이버</th><th width="20%">팀</th><th width="20%">포인트</th>`; } else { headerRow.innerHTML = `<th width="10%">순위</th><th width="40%">컨스트럭터</th><th width="30%">소속 선수</th><th width="20%">포인트</th>`; } if (currentData.length === 0) { container.innerHTML = `<tr><td colspan="4" style="padding:30px; color:#666;">데이터가 없습니다.</td></tr>`; return; } container.innerHTML = currentData.map((item, idx) => { const rank = idx + 1; const tColor = getTeamColor(item.team); let changeHTML = ''; if (currentStandingsView.roundIndex !== -1 && prevData) { const prevItem = prevData.find(p => p.name === item.name); if (prevItem) { const prevRank = prevData.indexOf(prevItem) + 1; const diff = prevRank - rank; if (diff > 0) changeHTML = `<span class="rank-change rc-up">▲${diff}</span>`; else if (diff < 0) changeHTML = `<span class="rank-change rc-down">▼${Math.abs(diff)}</span>`; else changeHTML = `<span class="rank-change rc-same">-</span>`; } else { changeHTML = `<span class="rank-change rc-up">NEW</span>`; } } if (currentStandingsView.type === 'driver') { return `<tr><td><span class="rank-num rank-${rank}">${rank}</span>${changeHTML}</td><td><div class="cell-left"><img src="${getPlayerImg(item.name)}" class="p-avatar" onerror="this.src='images/logo.png'"><span style="font-weight:bold;">${item.name}</span></div></td><td class="team-text-stroke" style="color:${tColor}; font-weight:900;">${item.team}</td><td style="font-size:1.1rem; font-weight:900; color:var(--primary-mint); font-family:var(--font-main);">${item.points} PT</td></tr>`; } else { const avatarHTML = item.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="mini-avatar" title="${dName}" onerror="this.src='images/logo.png'">`).join(''); return `<tr><td><span class="rank-num rank-${rank}">${rank}</span>${changeHTML}</td><td class="team-text-stroke" style="font-weight:900; font-size:1.3rem; color:${tColor}; text-align:left; padding-left:30px;">${item.name}</td><td><div class="duo-avatar-box">${avatarHTML}</div></td><td style="font-size:1.1rem; font-weight:900; color:var(--primary-mint); font-family:var(--font-main);">${item.points} PT</td></tr>`; } }).join(''); 
+
+function renderStandings() { 
+    const container = document.getElementById('standings-list'); 
+    const headerRow = document.getElementById('standings-header-row'); 
+    const roundNav = document.getElementById('standings-round-btns'); 
+    if (!container) return; 
+    
+    const availableTracks = TRACK_ORDER.filter(t => appData.mainRace[t] && appData.mainRace[t].length > 0); 
+    const roundCount = availableTracks.length; 
+    
+    let navHTML = availableTracks.map((t, i) => `<button class="round-btn ${currentStandingsView.roundIndex === i ? 'active' : ''}" onclick="setStandingsRound(${i})">${t}</button>`).join(''); 
+    navHTML += `<button class="round-btn ${currentStandingsView.roundIndex === -1 ? 'active' : ''}" onclick="setStandingsRound(-1)">최종순위</button>`; 
+    roundNav.innerHTML = navHTML; 
+    
+    let targetIdx = currentStandingsView.roundIndex === -1 ? roundCount - 1 : currentStandingsView.roundIndex; 
+    if (targetIdx < 0) targetIdx = -1; 
+    
+    let currentData = calculatePointsUntil(targetIdx, currentStandingsView.type); 
+    let prevData = null; 
+    
+    if (currentStandingsView.roundIndex !== -1 && targetIdx > 0) { 
+        prevData = calculatePointsUntil(targetIdx - 1, currentStandingsView.type); 
+    } 
+    
+    if (currentStandingsView.type === 'driver') { 
+        headerRow.innerHTML = `<th width="10%">순위</th><th width="40%">드라이버</th><th width="20%">팀</th><th width="20%">포인트</th>`; 
+    } else { 
+        headerRow.innerHTML = `<th width="10%">순위</th><th width="40%">컨스트럭터</th><th width="30%">소속 선수</th><th width="20%">포인트</th>`; 
+    } 
+    
+    if (currentData.length === 0) { 
+        container.innerHTML = `<tr><td colspan="4" style="padding:30px; color:#666;">데이터가 없습니다.</td></tr>`; 
+        return; 
+    } 
+    
+    container.innerHTML = currentData.map((item, idx) => { 
+        const rank = idx + 1; 
+        const tColor = getTeamColor(item.team); 
+        let changeHTML = ''; 
+        
+        if (currentStandingsView.roundIndex !== -1 && prevData) { 
+            const prevItem = prevData.find(p => p.name === item.name); 
+            if (prevItem) { 
+                const prevRank = prevData.indexOf(prevItem) + 1; 
+                const diff = prevRank - rank; 
+                if (diff > 0) changeHTML = `<span class="rank-change rc-up">▲${diff}</span>`; 
+                else if (diff < 0) changeHTML = `<span class="rank-change rc-down">▼${Math.abs(diff)}</span>`; 
+                else changeHTML = `<span class="rank-change rc-same">-</span>`; 
+            } else { 
+                changeHTML = `<span class="rank-change rc-up">NEW</span>`; 
+            } 
+        } 
+        
+        if (currentStandingsView.type === 'driver') { 
+            // [수정] 드라이버 모드: style="border-color: ${tColor};" 추가
+            return `<tr>
+                <td><span class="rank-num rank-${rank}">${rank}</span>${changeHTML}</td>
+                <td><div class="cell-left">
+                    <img src="${getPlayerImg(item.name)}" class="p-avatar" style="border-color: ${tColor};" onerror="this.src='images/logo.png'">
+                    <span style="font-weight:bold;">${item.name}</span>
+                </div></td>
+                <td class="team-text-stroke" style="color:${tColor}; font-weight:900;">${item.team}</td>
+                <td style="font-size:1.1rem; font-weight:900; color:var(--primary-mint); font-family:var(--font-main);">${item.points} PT</td>
+            </tr>`; 
+        } else { 
+            // [참고] 컨스트럭터 모드는 여러 선수가 묶이므로 개별 테두리 적용은 선택사항 (여기선 생략)
+            const avatarHTML = item.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="mini-avatar" title="${dName}" onerror="this.src='images/logo.png'">`).join(''); 
+            return `<tr>
+                <td><span class="rank-num rank-${rank}">${rank}</span>${changeHTML}</td>
+                <td class="team-text-stroke" style="font-weight:900; font-size:1.3rem; color:${tColor}; text-align:left; padding-left:30px;">${item.name}</td>
+                <td><div class="duo-avatar-box">${avatarHTML}</div></td>
+                <td style="font-size:1.1rem; font-weight:900; color:var(--primary-mint); font-family:var(--font-main);">${item.points} PT</td>
+            </tr>`; 
+        } 
+    }).join(''); 
 }
-function calculatePointsUntil(roundIdx, type) { /* ... 기존과 동일 ... */ 
-    let pointsMap = {}; for (let i = 0; i <= roundIdx; i++) { const trackName = TRACK_ORDER[i]; if (!appData.mainRace[trackName]) continue; appData.mainRace[trackName].forEach(r => { if (!pointsMap[r.name]) { pointsMap[r.name] = { points: 0, team: r.team || 'FA', name: r.name }; } pointsMap[r.name].points += (r.points || 0); }); } if (type === 'driver') { return Object.values(pointsMap).sort((a, b) => b.points - a.points); } else { let teamMap = {}; Object.values(pointsMap).forEach(p => { if (!teamMap[p.team]) { teamMap[p.team] = { name: p.team, points: 0, driverList: [] }; } teamMap[p.team].points += p.points; if (!teamMap[p.team].driverList.includes(p.name)) { teamMap[p.team].driverList.push(p.name); } }); return Object.values(teamMap).map(t => ({ name: t.name, points: t.points, team: t.name, driverList: t.driverList })).sort((a, b) => b.points - a.points); } 
+
+function calculatePointsUntil(roundIdx, type) { 
+    let pointsMap = {}; 
+    for (let i = 0; i <= roundIdx; i++) { 
+        const trackName = TRACK_ORDER[i]; 
+        if (!appData.mainRace[trackName]) continue; 
+        appData.mainRace[trackName].forEach(r => { 
+            if (!pointsMap[r.name]) { 
+                pointsMap[r.name] = { points: 0, team: r.team || 'FA', name: r.name }; 
+            } 
+            pointsMap[r.name].points += (r.points || 0); 
+        }); 
+    } 
+    
+    if (type === 'driver') { 
+        return Object.values(pointsMap).sort((a, b) => b.points - a.points); 
+    } else { 
+        let teamMap = {}; 
+        Object.values(pointsMap).forEach(p => { 
+            if (!teamMap[p.team]) { 
+                teamMap[p.team] = { name: p.team, points: 0, driverList: [] }; 
+            } 
+            teamMap[p.team].points += p.points; 
+            if (!teamMap[p.team].driverList.includes(p.name)) { 
+                teamMap[p.team].driverList.push(p.name); 
+            } 
+        }); 
+        return Object.values(teamMap).map(t => ({ name: t.name, points: t.points, team: t.name, driverList: t.driverList })).sort((a, b) => b.points - a.points); 
+    } 
 }
-window.setPodiumType = (type) => { /* ... 기존과 동일 ... */
-    currentPodiumType = type; document.getElementById('podium-btn-driver').classList.remove('active'); document.getElementById('podium-btn-constructor').classList.remove('active'); document.getElementById(`podium-btn-${type}`).classList.add('active'); renderPodium(); 
+
+window.setPodiumType = (type) => { 
+    currentPodiumType = type; 
+    document.getElementById('podium-btn-driver').classList.remove('active'); 
+    document.getElementById('podium-btn-constructor').classList.remove('active'); 
+    document.getElementById(`podium-btn-${type}`).classList.add('active'); 
+    renderPodium(); 
 };
-function renderPodium() { /* ... 기존과 동일 ... */
-    const container = document.getElementById('podium-display-area'); if (!container) return; const lastRoundIdx = TRACK_ORDER.length - 1; let validIdx = -1; for(let i=0; i<=lastRoundIdx; i++) { if(appData.mainRace[TRACK_ORDER[i]]) validIdx = i; } if (validIdx === -1) { container.innerHTML = '<p style="text-align:center; color:#888;">아직 진행된 경기가 없습니다.</p>'; return; } const topData = calculatePointsUntil(validIdx, currentPodiumType).slice(0, 3); if (topData.length === 0) return; const createCard = (d, rankClass, rankNum) => { if (!d) return ''; const tColor = getTeamColor(d.team); let imgHTML = ''; if (currentPodiumType === 'driver') { imgHTML = `<img src="${getPlayerImg(d.name)}" class="podium-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`; } else { const duoHTML = d.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="podium-duo-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`).join(''); imgHTML = `<div class="podium-duo-box">${duoHTML}</div>`; } let textHTML = ''; if (currentPodiumType === 'constructor') { textHTML = `<div class="podium-name team-text-stroke" style="color:${tColor}; margin-bottom:10px;">${d.name}</div><div class="podium-points">${d.points} PT</div>`; } else { textHTML = `<div class="podium-name">${d.name}</div><div class="podium-team team-text-stroke" style="color:${tColor}; font-weight:900;">${d.team}</div><div class="podium-points">${d.points} PT</div>`; } return `<div class="podium-card ${rankClass}" style="border-bottom-color:${tColor};"><div class="podium-rank">${rankNum}</div>${imgHTML}<div class="podium-info-wrap" style="text-align:center;">${textHTML}</div></div>`; }; container.innerHTML = `<div class="podium-container">${createCard(topData[0], 'p-1st', 1)}${createCard(topData[1], 'p-2nd', 2)}${createCard(topData[2], 'p-3rd', 3)}</div>`; 
+
+function renderPodium() { 
+    const container = document.getElementById('podium-display-area'); 
+    if (!container) return; 
+    
+    const lastRoundIdx = TRACK_ORDER.length - 1; 
+    let validIdx = -1; 
+    for(let i=0; i<=lastRoundIdx; i++) { 
+        if(appData.mainRace[TRACK_ORDER[i]]) validIdx = i; 
+    } 
+    
+    if (validIdx === -1) { 
+        container.innerHTML = '<p style="text-align:center; color:#888;">아직 진행된 경기가 없습니다.</p>'; 
+        return; 
+    } 
+    
+    const topData = calculatePointsUntil(validIdx, currentPodiumType).slice(0, 3); 
+    if (topData.length === 0) return; 
+    
+    const createCard = (d, rankClass, rankNum) => { 
+        if (!d) return ''; 
+        const tColor = getTeamColor(d.team); 
+        let imgHTML = ''; 
+        if (currentPodiumType === 'driver') { 
+            imgHTML = `<img src="${getPlayerImg(d.name)}" class="podium-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`; 
+        } else { 
+            const duoHTML = d.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="podium-duo-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`).join(''); 
+            imgHTML = `<div class="podium-duo-box">${duoHTML}</div>`; 
+        } 
+        
+        let textHTML = ''; 
+        if (currentPodiumType === 'constructor') { 
+            textHTML = `<div class="podium-name team-text-stroke" style="color:${tColor}; margin-bottom:10px;">${d.name}</div><div class="podium-points">${d.points} PT</div>`; 
+        } else { 
+            textHTML = `<div class="podium-name">${d.name}</div><div class="podium-team team-text-stroke" style="color:${tColor}; font-weight:900;">${d.team}</div><div class="podium-points">${d.points} PT</div>`; 
+        } 
+        return `<div class="podium-card ${rankClass}" style="border-bottom-color:${tColor};"><div class="podium-rank">${rankNum}</div>${imgHTML}<div class="podium-info-wrap" style="text-align:center;">${textHTML}</div></div>`; 
+    }; 
+    
+    container.innerHTML = `<div class="podium-container">${createCard(topData[0], 'p-1st', 1)}${createCard(topData[1], 'p-2nd', 2)}${createCard(topData[2], 'p-3rd', 3)}</div>`; 
 }
+
 window.switchTab = (tabId, isFromHistory = false) => {
     // 1. 화면 전환 처리
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -311,6 +485,72 @@ window.switchTab = (tabId, isFromHistory = false) => {
     window.scrollTo(0,0);
 };
 
-// ... (renderPlayersGrid, renderPreQuali 는 기존 코드 그대로 사용) ...
-function renderPlayersGrid() { const gridContainer = document.getElementById('players-grid'); if (!gridContainer) return; const playersList = appData.players; if (playersList.length === 0) { gridContainer.innerHTML = '<p style="text-align:center; color:#888;">등록된 선수가 없습니다.</p>'; return; } const teamsMap = {}; playersList.forEach(p => { if (!p.team) p.team = "FA"; if (!teamsMap[p.team]) teamsMap[p.team] = []; teamsMap[p.team].push(p); }); const sortedTeamNames = Object.keys(teamsMap).sort((a, b) => { if (a === 'FA') return 1; if (b === 'FA') return -1; return a.localeCompare(b); }); let htmlOutput = ''; sortedTeamNames.forEach(teamName => { const teamMembers = teamsMap[teamName]; const teamColor = getTeamColor(teamName); const cardStyle = `background: linear-gradient(135deg, ${teamColor}dd 0%, #111 80%); border-color: ${teamColor};`; const headerStyle = `color: ${teamColor}; filter: brightness(1.5);`; const membersHTML = teamMembers.map(member => `<div class="player-card-box"><img src="${member.img || 'images/logo.png'}" class="player-photo-large" onerror="this.src='images/logo.png'"><div class="player-info-box"><span class="player-name-large">${member.name}</span></div></div>`).join(''); htmlOutput += `<div class="team-card" style="${cardStyle}"><div class="team-name-header team-text-stroke" style="${headerStyle}">${teamName}</div><div class="team-players-row">${membersHTML}</div></div>`; }); gridContainer.innerHTML = htmlOutput; }
-function renderPreQuali() { const list = document.getElementById('pre-quali-list'); if (!list) return; list.innerHTML = appData.preQuali.map(p => { const tColor = getTeamColor(p.team); return `<tr><td><span class="rank-num rank-${p.rank}">${p.rank}</span></td><td><div class="cell-left"><img src="${p.img || 'images/logo.png'}" class="p-avatar" onerror="this.src='images/logo.png'"><span style="font-weight:bold;">${p.name}</span></div></td><td>${p.gender}</td><td class="record-time" style="color:var(--primary-mint);">${p.record}</td><td class="gap-time">${p.gap}</td><td><span class="partner-box">${p.partner}</span></td><td class="team-text-stroke" style="font-weight:900; color:${tColor};">${p.team}</td></tr>`; }).join(''); }
+// [수정] 참가자 탭 렌더링 (큰 사진 테두리 적용)
+function renderPlayersGrid() { 
+    const gridContainer = document.getElementById('players-grid'); 
+    if (!gridContainer) return; 
+    
+    const playersList = appData.players; 
+    if (playersList.length === 0) { 
+        gridContainer.innerHTML = '<p style="text-align:center; color:#888;">등록된 선수가 없습니다.</p>'; 
+        return; 
+    } 
+    
+    const teamsMap = {}; 
+    playersList.forEach(p => { 
+        if (!p.team) p.team = "FA"; 
+        if (!teamsMap[p.team]) teamsMap[p.team] = []; 
+        teamsMap[p.team].push(p); 
+    }); 
+    
+    const sortedTeamNames = Object.keys(teamsMap).sort((a, b) => { 
+        if (a === 'FA') return 1; 
+        if (b === 'FA') return -1; 
+        return a.localeCompare(b); 
+    }); 
+    
+    let htmlOutput = ''; 
+    sortedTeamNames.forEach(teamName => { 
+        const teamMembers = teamsMap[teamName]; 
+        const teamColor = getTeamColor(teamName); 
+        const cardStyle = `background: linear-gradient(135deg, ${teamColor}dd 0%, #111 80%); border-color: ${teamColor};`; 
+        const headerStyle = `color: ${teamColor}; filter: brightness(1.5);`; 
+        
+        // [수정] style="border-color: ${teamColor};" 추가
+        const membersHTML = teamMembers.map(member => 
+            `<div class="player-card-box">
+                <img src="${member.img || 'images/logo.png'}" class="player-photo-large" style="border-color: ${teamColor};" onerror="this.src='images/logo.png'">
+                <div class="player-info-box">
+                    <span class="player-name-large">${member.name}</span>
+                </div>
+            </div>`
+        ).join(''); 
+        
+        htmlOutput += `<div class="team-card" style="${cardStyle}"><div class="team-name-header team-text-stroke" style="${headerStyle}">${teamName}</div><div class="team-players-row">${membersHTML}</div></div>`; 
+    }); 
+    
+    gridContainer.innerHTML = htmlOutput; 
+}
+
+// [수정] 예선 렌더링 (작은 사진 테두리 적용)
+function renderPreQuali() { 
+    const list = document.getElementById('pre-quali-list'); 
+    if (!list) return; 
+    
+    list.innerHTML = appData.preQuali.map(p => { 
+        const tColor = getTeamColor(p.team); 
+        // [수정] style="border-color: ${tColor};" 추가
+        return `<tr>
+            <td><span class="rank-num rank-${p.rank}">${p.rank}</span></td>
+            <td><div class="cell-left">
+                <img src="${p.img || 'images/logo.png'}" class="p-avatar" style="border-color: ${tColor};" onerror="this.src='images/logo.png'">
+                <span style="font-weight:bold;">${p.name}</span>
+            </div></td>
+            <td>${p.gender}</td>
+            <td class="record-time" style="color:var(--primary-mint);">${p.record}</td>
+            <td class="gap-time">${p.gap}</td>
+            <td><span class="partner-box">${p.partner}</span></td>
+            <td class="team-text-stroke" style="font-weight:900; color:${tColor};">${p.team}</td>
+        </tr>`; 
+    }).join(''); 
+}
