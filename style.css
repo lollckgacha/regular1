@@ -476,3 +476,21 @@ nav {
     filter: brightness(1.2); /* 밝기 20% 증가 */
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); /* 하얗게 빛나는 그림자 추가 */
 }
+.track-date-label {
+    display: block; /* 줄바꿈 */
+    color: var(--primary-mint);
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    text-shadow: 0 0 10px rgba(0, 229, 188, 0.3);
+}
+
+/* 모바일에서는 날짜 크기 살짝 조정 */
+@media (max-width: 768px) {
+    .track-date-label {
+        font-size: 1rem;
+    }
+}
