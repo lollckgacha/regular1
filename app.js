@@ -56,7 +56,7 @@ window.onpopstate = (event) => {
     if (event.state && event.state.tab) {
         switchTab(event.state.tab, true);
     } else {
-        switchTab('home', true);
+        switchTab('home', true);  
     }
 };
 
@@ -573,6 +573,7 @@ function renderPreQuali() {
         </div>
     `;
 }
+
 
 
 
