@@ -575,9 +575,12 @@ window.setPodiumType = (type) => {
 };
 
 function renderPodium() { 
-    const container = document.getElementById('podium-display-area'); 
-    if (!container) return; 
+    const driverContainer = document.getElementById('podium-driver-area');
+    const constContainer = document.getElementById('podium-constructor-area');
     
+    if (!driverContainer || !constContainer) return; 
+    
+    // 현재까지 진행된 라운드 인덱스 계산
     const lastRoundIdx = TRACK_ORDER.length - 1; 
     let validIdx = -1; 
     for(let i=0; i<=lastRoundIdx; i++) { 
@@ -585,34 +588,56 @@ function renderPodium() {
     } 
     
     if (validIdx === -1) { 
-        container.innerHTML = '<p style="text-align:center; color:#888;">아직 진행된 경기가 없습니다.</p>'; 
+        driverContainer.innerHTML = '<p style="color:#888; font-size:0.8rem;">진행된 경기 없음</p>';
+        constContainer.innerHTML = '<p style="color:#888; font-size:0.8rem;">진행된 경기 없음</p>';
         return; 
     } 
     
-    const topData = calculatePointsUntil(validIdx, currentPodiumType).slice(0, 3); 
-    if (topData.length === 0) return; 
-    
+    // 1. 드라이버 데이터 계산 및 렌더링
+    const driverData = calculatePointsUntil(validIdx, 'driver').slice(0, 3); 
+    driverContainer.innerHTML = generatePodiumHTML(driverData, 'driver');
+
+    // 2. 컨스트럭터 데이터 계산 및 렌더링
+    const constData = calculatePointsUntil(validIdx, 'constructor').slice(0, 3); 
+    constContainer.innerHTML = generatePodiumHTML(constData, 'constructor');
+}
+
+// [보조 함수] 포디움 HTML 생성기
+function generatePodiumHTML(dataList, type) {
+    if (dataList.length === 0) return '<p style="color:#888;">데이터 없음</p>';
+
     const createCard = (d, rankClass, rankNum) => { 
         if (!d) return ''; 
         const tColor = getTeamColor(d.team); 
         let imgHTML = ''; 
-        if (currentPodiumType === 'driver') { 
+        
+        if (type === 'driver') { 
+            // 드라이버: 기존 원형/사각형 유지
             imgHTML = `<img src="${getPlayerImg(d.name)}" class="podium-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`; 
         } else { 
-            const duoHTML = d.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="podium-duo-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`).join(''); 
-            imgHTML = `<div class="podium-duo-box">${duoHTML}</div>`; 
+            // [수정] 컨스트럭터: 박스에 테두리 색상을 주고, 이미지는 꽉 채움
+            const duoHTML = d.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="podium-duo-img" onerror="this.src='images/logo.png'">`).join(''); 
+            
+            // 박스 자체에 테두리 색상 적용
+            imgHTML = `<div class="podium-duo-box" style="border-color:${tColor};">${duoHTML}</div>`; 
         } 
         
-        let textHTML = ''; 
-        if (currentPodiumType === 'constructor') { 
-            textHTML = `<div class="podium-name team-text-stroke" style="color:${tColor}; margin-bottom:10px;">${d.name}</div><div class="podium-points">${d.points} PT</div>`; 
-        } else { 
-            textHTML = `<div class="podium-name">${d.name}</div><div class="podium-team team-text-stroke" style="color:${tColor}; font-weight:900;">${d.team}</div><div class="podium-points">${d.points} PT</div>`; 
-        } 
-        return `<div class="podium-card ${rankClass}" style="border-bottom-color:${tColor};"><div class="podium-rank">${rankNum}</div>${imgHTML}<div class="podium-info-wrap" style="text-align:center;">${textHTML}</div></div>`; 
+        return `<div class="podium-card ${rankClass}" style="border-bottom-color:${tColor};">
+            <div class="podium-rank">${rankNum}</div>
+            ${imgHTML}
+            <div class="podium-info-wrap" style="text-align:center; width:100%;">
+                <div class="podium-name">${d.name}</div>
+                <div class="podium-team team-text-stroke" style="color:${tColor};">${d.team}</div>
+                <div class="podium-points">${d.points} PT</div>
+            </div>
+        </div>`; 
     }; 
-    
-    container.innerHTML = `<div class="podium-container">${createCard(topData[0], 'p-1st', 1)}${createCard(topData[1], 'p-2nd', 2)}${createCard(topData[2], 'p-3rd', 3)}</div>`; 
+
+    return `<div class="podium-container compact-podium" style="min-height:auto; margin-top:0;">
+        ${createCard(dataList[1], 'p-2nd', 2)}
+        ${createCard(dataList[0], 'p-1st', 1)}
+        ${createCard(dataList[2], 'p-3rd', 3)}
+    </div>`;
 }
 
 window.switchTab = (tabId, isFromHistory = false) => {
@@ -626,7 +651,7 @@ window.switchTab = (tabId, isFromHistory = false) => {
     if (targetBtn) targetBtn.classList.add('active');
 
     if (!isFromHistory) {
-        history.pushState({ tab: tabId }, '', `#${tabId}`);  
+        history.pushState({ tab: tabId }, '', `#${tabId}`);
     }
 
     if (tabId === 'players') renderPlayersGrid();
