@@ -26,15 +26,31 @@ const TRACK_INFO = {
 const DEFAULT_TRACK = { img: "images/logo.png", flag: "🏁", name: "UNKNOWN TRACK" };
 
 // [상태 관리] 
-let currentStandingsView = { type: 'driver', roundIndex: -1 };
+let currentStandingsView = { type: 'driver', roundIndex: 0 };
 let currentPodiumType = 'driver';
 // [추가] 본선 뷰 상태 관리 (트랙, 세션)
 let currentMainView = { track: null, session: 'race' }; // 기본값: 레이스
 
 window.onload = () => {
     initFirebaseListeners();
+    
+    // URL에 있는 해시(#)값을 읽어서 해당 탭으로 이동 (없으면 home)
     const hash = window.location.hash.replace('#', '');
-    switchTab(hash || 'home');
+    const initialTab = hash || 'home';
+    
+    // 초기 상태를 히스토리에 저장 (replaceState 사용)
+    history.replaceState({ tab: initialTab }, '', `#${initialTab}`);
+    switchTab(initialTab, true); // true = 히스토리 추가 안 함 (이미 했으니까)
+};
+
+// [추가] 브라우저 뒤로가기/앞으로가기 버튼 감지
+window.onpopstate = (event) => {
+    if (event.state && event.state.tab) {
+        // 히스토리에 저장된 탭으로 이동 (히스토리 추가 X)
+        switchTab(event.state.tab, true);
+    } else {
+        switchTab('home', true);
+    }
 };
 
 function initFirebaseListeners() {
@@ -74,17 +90,18 @@ function getPlayerImg(name) {
 
 // 1. 트랙 탭 생성
 function setupMainTabs() {
-    // 퀄리파잉이나 레이스 중 하나라도 데이터가 있는 트랙 목록을 가져옴
     const qTracks = Object.keys(appData.mainQuali || {});
     const rTracks = Object.keys(appData.mainRace || {});
     const allTracks = [...new Set([...qTracks, ...rTracks])];
 
+    // 순서대로 정렬
     const tracks = TRACK_ORDER.filter(t => allTracks.includes(t));
     const container = document.getElementById('main-track-tabs');
     const sessionSelector = document.getElementById('session-selector');
 
     if (!container) return;
 
+    // 데이터가 아예 없으면 숨김
     if (tracks.length === 0) {
         container.innerHTML = `<div style="color:#555; padding:20px;">아직 진행된 경기가 없습니다.</div>`;
         sessionSelector.style.display = 'none';
@@ -92,43 +109,61 @@ function setupMainTabs() {
         return;
     }
 
-    sessionSelector.style.display = 'flex'; // 데이터가 있으면 세션 버튼 보임
+    sessionSelector.style.display = 'flex'; 
 
-    // 현재 선택된 트랙이 없거나 유효하지 않으면 첫 번째 트랙 선택
+    // 현재 트랙이 유효하지 않으면 첫 번째 트랙 선택
     if (!currentMainView.track || !tracks.includes(currentMainView.track)) {
         currentMainView.track = tracks[0];
+        currentMainView.session = 'quali'; // 초기화 시 퀄리파잉
     }
 
-    // 트랙 탭 버튼 렌더링
+    // 트랙 버튼 그리기 (현재 선택된 트랙 활성화)
     container.innerHTML = tracks.map(track => {
         const isActive = (currentMainView.track === track);
         return `<button class="tab-btn ${isActive ? 'active' : ''}" onclick="selectMainTrack('${track}')"><span>${track}</span></button>`;
     }).join('');
 
-    // 내용 렌더링 실행
+    // [핵심] 세션 버튼(퀄리파잉/레이스)의 디자인도 현재 상태에 맞춰 강제 업데이트
+    updateSessionButtons();
+
+    // 표 그리기
     renderMainContent();
 }
 
 // 2. 트랙 선택 시 호출
 window.selectMainTrack = (track) => {
     currentMainView.track = track;
-    setupMainTabs(); // 버튼 스타일 갱신
-    // (renderMainContent는 setupMainTabs 안에서 호출됨)
+    
+    // [중요] 다른 트랙을 누르면 무조건 '퀄리파잉'으로 리셋 (스포 방지)
+    currentMainView.session = 'quali'; 
+    
+    // 탭과 버튼 상태를 모두 갱신하기 위해 setupMainTabs 호출
+    setupMainTabs(); 
 };
 
 // 3. 세션 선택 (퀄리파잉 / 레이스) 버튼 클릭 시 호출
 window.setMainSession = (sessionType) => {
     currentMainView.session = sessionType;
     
-    // 버튼 스타일 업데이트
-    const btns = document.querySelectorAll('.session-btn');
-    btns.forEach(b => b.classList.remove('active'));
-    
-    const targetBtn = document.querySelector(`.session-btn[onclick*="${sessionType}"]`);
-    if(targetBtn) targetBtn.classList.add('active');
+    // 버튼 디자인 업데이트
+    updateSessionButtons();
 
+    // 내용 다시 그리기
     renderMainContent();
 };
+
+function updateSessionButtons() {
+    const btns = document.querySelectorAll('.session-btn');
+    
+    btns.forEach(b => {
+        b.classList.remove('active'); // 일단 다 끄고
+        
+        // 버튼의 onclick 속성에 현재 세션 이름('quali' 또는 'race')이 포함되어 있으면 켜기
+        if (b.getAttribute('onclick').includes(`'${currentMainView.session}'`)) {
+            b.classList.add('active');
+        }
+    });
+}
 
 // 4. 실제 콘텐츠(표) 그리기 (중앙 제어)
 function renderMainContent() {
@@ -251,18 +286,28 @@ window.setPodiumType = (type) => { /* ... 기존과 동일 ... */
 function renderPodium() { /* ... 기존과 동일 ... */
     const container = document.getElementById('podium-display-area'); if (!container) return; const lastRoundIdx = TRACK_ORDER.length - 1; let validIdx = -1; for(let i=0; i<=lastRoundIdx; i++) { if(appData.mainRace[TRACK_ORDER[i]]) validIdx = i; } if (validIdx === -1) { container.innerHTML = '<p style="text-align:center; color:#888;">아직 진행된 경기가 없습니다.</p>'; return; } const topData = calculatePointsUntil(validIdx, currentPodiumType).slice(0, 3); if (topData.length === 0) return; const createCard = (d, rankClass, rankNum) => { if (!d) return ''; const tColor = getTeamColor(d.team); let imgHTML = ''; if (currentPodiumType === 'driver') { imgHTML = `<img src="${getPlayerImg(d.name)}" class="podium-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`; } else { const duoHTML = d.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="podium-duo-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`).join(''); imgHTML = `<div class="podium-duo-box">${duoHTML}</div>`; } let textHTML = ''; if (currentPodiumType === 'constructor') { textHTML = `<div class="podium-name team-text-stroke" style="color:${tColor}; margin-bottom:10px;">${d.name}</div><div class="podium-points">${d.points} PT</div>`; } else { textHTML = `<div class="podium-name">${d.name}</div><div class="podium-team team-text-stroke" style="color:${tColor}; font-weight:900;">${d.team}</div><div class="podium-points">${d.points} PT</div>`; } return `<div class="podium-card ${rankClass}" style="border-bottom-color:${tColor};"><div class="podium-rank">${rankNum}</div>${imgHTML}<div class="podium-info-wrap" style="text-align:center;">${textHTML}</div></div>`; }; container.innerHTML = `<div class="podium-container">${createCard(topData[0], 'p-1st', 1)}${createCard(topData[1], 'p-2nd', 2)}${createCard(topData[2], 'p-3rd', 3)}</div>`; 
 }
-window.switchTab = (tabId) => {
+window.switchTab = (tabId, isFromHistory = false) => {
+    // 1. 화면 전환 처리
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+    
     const targetSection = document.getElementById(`view-${tabId}`);
     if (targetSection) targetSection.classList.add('active');
+    
     const targetBtn = document.querySelector(`.nav-link[onclick*="${tabId}"]`);
     if (targetBtn) targetBtn.classList.add('active');
 
+    // 2. 히스토리 스택에 추가 (뒤로가기를 눌렀을 때가 아닐 경우에만)
+    if (!isFromHistory) {
+        history.pushState({ tab: tabId }, '', `#${tabId}`);
+    }
+
+    // 3. 탭별 데이터 로드 로직
     if (tabId === 'players') renderPlayersGrid();
-    if (tabId === 'main') setupMainTabs(); // [변경] 통합 본선 함수 호출
+    if (tabId === 'main') setupMainTabs();
     if (tabId === 'standings') renderStandings(); 
     if (tabId === 'podium') renderPodium();       
+    
     window.scrollTo(0,0);
 };
 
