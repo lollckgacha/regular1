@@ -553,7 +553,7 @@ function renderPreQuali() {
                 <span class="track-date-label">${PRE_QUALI_DATE}</span>
                 <span class="track-flag">${redbullInfo.flag}</span>
                 <h2 class="track-name-title" style="font-size: 1.8rem;">레드불링</h2>
-                <span class="track-session-badge">프렉티스 예선</span>
+                <span class="track-session-badge">프렉티스 예선</span>  
             </div>
              <div class="track-map-wrapper">
                 <img src="${redbullInfo.img}" class="track-map-img" onerror="this.style.display='none'">
