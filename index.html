@@ -15,7 +15,7 @@
 <body>
 
     <nav>
-        <button class="nav-link active" onclick="switchTab('home')">HOME</button>
+        <button class="nav-link active" onclick="switchTab('home')">메인</button>
         <button class="nav-link" onclick="switchTab('players')">참가자</button>
         <button class="nav-link" onclick="switchTab('pre-quali')">예선</button>
         <button class="nav-link" onclick="switchTab('main')">본선</button>
@@ -34,16 +34,16 @@
                 </div>
                 <div class="home-nav-area">
                     <button class="trap-btn" onclick="switchTab('players')">
-                        <span class="btn-text">참가자 라인업</span><span class="btn-arrow">→</span>
+                        <span class="btn-text">참가자</span><span class="btn-arrow">→</span>
                     </button>
                     <button class="trap-btn" onclick="switchTab('pre-quali')">
-                        <span class="btn-text">예선 결과</span><span class="btn-arrow">→</span>
+                        <span class="btn-text">예선</span><span class="btn-arrow">→</span>
                     </button>
                     <button class="trap-btn" onclick="switchTab('main')">
-                        <span class="btn-text">본선 (퀄리파잉/레이스)</span><span class="btn-arrow">→</span>
+                        <span class="btn-text">본선</span><span class="btn-arrow">→</span>
                     </button>
                     <button class="trap-btn highlight" onclick="switchTab('standings')">
-                        <span class="btn-text">종합 순위</span><span class="btn-arrow">→</span>
+                        <span class="btn-text">종합순위</span><span class="btn-arrow">→</span>
                     </button>
                     <button class="trap-btn" onclick="switchTab('podium')">
                         <span class="btn-text">포디움</span><span class="btn-arrow">→</span>
@@ -54,7 +54,7 @@
 
         <section id="view-players" class="view-section">
             <div class="track-header-card" style="padding:20px; justify-content:center; min-height:auto;">
-                <h2 class="track-name-title">2026 참가자 라인업</h2>
+                <h2 class="track-name-title">참가자 라인업</h2>
             </div>
             <div id="players-grid" class="players-grid-container"></div>
         </section>
@@ -73,7 +73,7 @@
                 <thead>
                     <tr>
                         <th width="5%">순위</th><th width="25%">드라이버</th><th width="5%">성별</th>
-                        <th width="12%">기록</th><th width="10%">차이</th><th width="15%">파트너</th><th width="10%">팀</th>
+                        <th width="12%">기록</th><th width="10%">차이</th><th width="15%">팀원</th><th width="10%">팀</th>
                     </tr>
                 </thead>
                 <tbody id="pre-quali-list"></tbody>
@@ -142,4 +142,5 @@
 
 </body>
 </html>
+
 
