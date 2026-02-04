@@ -400,3 +400,37 @@ nav {
     border-color: var(--primary-mint);
     box-shadow: 0 0 15px var(--mint-glow);
 }
+
+.maker-badge {
+    /* 화면에 고정 */
+    position: fixed;
+    bottom: 20px;   /* 하단에서 20px 띄움 */
+    right: 20px;    /* 우측에서 20px 띄움 */
+    
+    /* 디자인 */
+    background-color: rgba(0, 0, 0, 0.6); /* 반투명 블랙 */
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 50px; /* 알약 모양 */
+    font-size: 11px;     /* 작고 깔끔하게 */
+    letter-spacing: -0.5px;
+    z-index: 9999;       /* 최상단에 위치 */
+    
+    /* 그림자 및 효과 */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    backdrop-filter: blur(4px); /* 배경 살짝 흐리게 (고급스러운 느낌) */
+    transition: all 0.3s ease;
+    cursor: default;
+    user-select: none;   /* 텍스트 드래그 방지 */
+}
+
+/* 마우스를 올렸을 때 살짝 진해지는 효과 */
+.maker-badge:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: translateY(-2px); /* 살짝 위로 이동 */
+}
+
+.maker-badge strong {
+    color: #fff; 
+    margin-left: 3px;
+}
