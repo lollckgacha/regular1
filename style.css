@@ -344,8 +344,25 @@ nav {
 }
 
 /* 참가자 그리드 */
-.players-grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 40px; }
+.players-grid-container { 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; /* 핵심: 마지막 줄 아이템 중앙 정렬 */
+    gap: 30px; 
+    margin-top: 40px; 
+}
+
+/* [수정] 팀 카드 너비 (3열 배치 계산) */
 .team-card {
+    /* (100% - 간격 60px) / 3 = 정확히 3등분 */
+    width: calc((100% - 60px) / 3);
+    
+    /* 레이아웃 깨짐 방지 */
+    box-sizing: border-box; 
+    flex-grow: 0; 
+    flex-shrink: 0;
+
+    /* 기존 스타일 유지 */
     border-radius: 15px; padding: 25px; position: relative; overflow: hidden;
     background: var(--bg-card); border: 2px solid #333; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -371,13 +388,14 @@ nav {
 
 .player-info-box { text-align: center; }
 .player-name-large { font-family: var(--font-main); font-size: 1.3rem; font-weight: 700; color: var(--text-white); margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-@media (max-width: 768px) {
-    .players-grid-container { grid-template-columns: 1fr; }
-    .team-card { padding: 20px; }
-    .player-photo-large { width: 110px; height: 110px; }
-    .team-name-header { font-size: 1.6rem; }
+@media (max-width: 1200px) {
+    .team-card { width: calc((100% - 30px) / 2); } /* 2열 배치 */
 }
 
+@media (max-width: 768px) {
+    .players-grid-container { flex-direction: column; align-items: center; }
+    .team-card { width: 100%; max-width: 450px; } /* 1열 배치 */
+}
 .session-nav-container {
     display: flex; justify-content: center; gap: 20px; margin: 20px 0 30px 0;
 }
@@ -431,7 +449,7 @@ nav {
     transform: translateY(-2px); /* 살짝 위로 이동 */
 }
 
-.maker-badge strong {  
+.maker-badge strong {
     color: #fff; 
     margin-left: 3px;
 }
