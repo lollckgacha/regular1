@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGULAR1 SEASON2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700;900&family=Exo+2:wght@300;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="app.js" defer></script>
+</head>
+<body>
+
+    <nav>
+        <button class="nav-link active" onclick="switchTab('home')">HOME</button>
+        <button class="nav-link" onclick="switchTab('players')">참가자</button>
+        <button class="nav-link" onclick="switchTab('pre-quali')">예선</button>
+        <button class="nav-link" onclick="switchTab('main')">본선</button>
+        <button class="nav-link" onclick="switchTab('standings')">종합순위</button>
+        <button class="nav-link" onclick="switchTab('podium')">포디움</button>
+    </nav>
+
+    <div class="main-bg-glow"></div>
+
+    <div class="container">
+        
+        <section id="view-home" class="view-section active">
+            <div class="home-container">
+                <div class="home-logo-area">
+                    <img src="images/logo.png" alt="REGULAR1 SEASON2 LOGO" class="main-home-logo">
+                </div>
+                <div class="home-nav-area">
+                    <button class="trap-btn" onclick="switchTab('players')">
+                        <span class="btn-text">참가자 라인업</span><span class="btn-arrow">→</span>
+                    </button>
+                    <button class="trap-btn" onclick="switchTab('pre-quali')">
+                        <span class="btn-text">예선 결과</span><span class="btn-arrow">→</span>
+                    </button>
+                    <button class="trap-btn" onclick="switchTab('main')">
+                        <span class="btn-text">본선 (퀄리파잉/레이스)</span><span class="btn-arrow">→</span>
+                    </button>
+                    <button class="trap-btn highlight" onclick="switchTab('standings')">
+                        <span class="btn-text">종합 순위</span><span class="btn-arrow">→</span>
+                    </button>
+                    <button class="trap-btn" onclick="switchTab('podium')">
+                        <span class="btn-text">포디움</span><span class="btn-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-players" class="view-section">
+            <div class="track-header-card" style="padding:20px; justify-content:center; min-height:auto;">
+                <h2 class="track-name-title">2026 참가자 라인업</h2>
+            </div>
+            <div id="players-grid" class="players-grid-container"></div>
+        </section>
+
+        <section id="view-pre-quali" class="view-section">
+            <div class="track-header-card">
+                <div class="track-info-box">
+                    <h2 class="track-name-title">레드불링</h2>
+                    <span class="track-session-badge">프리시즌 타임어택</span>
+                </div>
+                <div class="track-map-wrapper">
+                    <img src="images/tracks/redbull.webp" class="track-map-img" alt="Red Bull Ring Map" onerror="this.style.display='none'">
+                </div>
+            </div>
+            <table class="f1-table">
+                <thead>
+                    <tr>
+                        <th width="5%">순위</th><th width="25%">드라이버</th><th width="5%">성별</th>
+                        <th width="12%">기록</th><th width="10%">차이</th><th width="15%">파트너</th><th width="10%">팀</th>
+                    </tr>
+                </thead>
+                <tbody id="pre-quali-list"></tbody>
+            </table>
+        </section>
+
+        <section id="view-main" class="view-section">
+            <div class="tab-group" id="main-track-tabs"></div>
+
+            <div class="session-nav-container" id="session-selector" style="display:none;">
+                <button class="session-btn active" onclick="setMainSession('quali')">퀄리파잉</button>
+                <button class="session-btn" onclick="setMainSession('race')">레이스</button>
+            </div>
+
+            <div id="main-content-area"></div>
+        </section>
+
+        <section id="view-standings" class="view-section">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <img src="images/logo.png" class="section-deco-logo" alt="Logo">
+            </div>
+            <div class="track-header-card" style="padding:20px; justify-content:center; min-height:auto; flex-direction:column; gap:15px;">
+                <h2 class="track-name-title">종합 챔피언십 순위</h2>
+                <div class="standings-type-nav">
+                    <button class="type-btn active" onclick="setStandingsType('driver')">드라이버</button>
+                    <button class="type-btn" onclick="setStandingsType('constructor')">컨스트럭터</button>
+                </div>
+                <div class="standings-round-nav" id="standings-round-btns"></div>
+            </div>
+            <table class="f1-table">
+                <thead>
+                    <tr id="standings-header-row"></tr>
+                </thead>
+                <tbody id="standings-list"></tbody>
+            </table>
+        </section>
+
+        <section id="view-podium" class="view-section">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <img src="images/logo.png" class="section-deco-logo" alt="Logo">
+            </div>
+            <h2 style="text-align:center; margin-bottom:20px; color:var(--primary-mint); font-family:'Chakra Petch';">포디움</h2>
+            <div style="text-align:center; margin-bottom:30px;">
+                <div class="standings-type-nav" style="justify-content:center;">
+                    <button class="type-btn active" id="podium-btn-driver" onclick="setPodiumType('driver')">드라이버</button>
+                    <button class="type-btn" id="podium-btn-constructor" onclick="setPodiumType('constructor')">컨스트럭터</button>
+                </div>
+            </div>
+            <div id="podium-display-area" class="podium-wrap">
+                <p style="text-align:center; color:#888;">데이터를 불러오는 중입니다...</p>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+            if ((e.ctrlKey || e.metaKey) && ((e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j')) || (e.key === 'U' || e.key === 'u'))) { e.preventDefault(); return false; }
+        });
+    </script>
+
+</body>
+</html>
