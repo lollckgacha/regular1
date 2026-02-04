@@ -479,7 +479,7 @@ nav {
 .track-date-label {
     display: block; /* 줄바꿈 */
     color: var(--primary-mint);
-    font-family: var(--font-main);
+    font-family: var(--font-main);  
     font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 5px;
