@@ -435,3 +435,26 @@ nav {
     color: #fff; 
     margin-left: 3px;
 }
+.player-img-wrapper {
+    display: inline-block;
+    cursor: pointer;       /* 마우스 올리면 손가락 모양 */
+    border-radius: 50%;    /* 둥근 모양에 맞춰 클릭 영역 설정 */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 튕기는 듯한 부드러운 모션 */
+}
+
+/* 2. 사진 자체의 애니메이션 설정 */
+.player-photo-large {
+    /* 기존 스타일 상속 + 전환 효과 추가 */
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+/* 3. 마우스를 올렸을 때 (Hover) 변화 */
+.player-img-wrapper:hover {
+    transform: scale(1.15); /* 전체 크기 1.15배 확대 */
+    z-index: 10;            /* 다른 요소보다 위로 */
+}
+
+.player-img-wrapper:hover .player-photo-large {
+    filter: brightness(1.2); /* 밝기 20% 증가 */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); /* 하얗게 빛나는 그림자 추가 */
+}
