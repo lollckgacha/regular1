@@ -538,31 +538,100 @@ function renderStandings() {
 
 function calculatePointsUntil(roundIdx, type) { 
     let pointsMap = {}; 
+
+    // 1. 데이터 집계 (포인트 및 순위 횟수 저장)
     for (let i = 0; i <= roundIdx; i++) { 
         const trackName = TRACK_ORDER[i]; 
         if (!appData.mainRace[trackName]) continue; 
+        
         appData.mainRace[trackName].forEach(r => { 
+            // 드라이버 기초 데이터 생성
             if (!pointsMap[r.name]) { 
-                pointsMap[r.name] = { points: 0, team: r.team || 'FA', name: r.name }; 
+                pointsMap[r.name] = { 
+                    points: 0, 
+                    team: r.team || 'FA', 
+                    name: r.name,
+                    // 순위별 횟수 저장을 위한 객체 (예: {1: 2, 2: 0, 3: 1 ...})
+                    positionCounts: {} 
+                }; 
             } 
-            pointsMap[r.name].points += (r.points || 0); 
+            
+            // 포인트 합산
+            pointsMap[r.name].points += (r.points || 0);
+            
+            // 순위 횟수 카운트 (DNF가 아닌 경우만)
+            const rank = parseInt(r.rank);
+            if (!isNaN(rank)) {
+                if (!pointsMap[r.name].positionCounts[rank]) {
+                    pointsMap[r.name].positionCounts[rank] = 0;
+                }
+                pointsMap[r.name].positionCounts[rank]++;
+            }
         }); 
     } 
     
+    // [공통] 카운트백 정렬 함수 (포인트 -> 1위횟수 -> 2위횟수 ... 순 비교)
+    const compareByCountback = (a, b) => {
+        // 1. 포인트 우선 비교
+        if (b.points !== a.points) {
+            return b.points - a.points; 
+        }
+
+        // 2. 포인트가 같으면 1위부터 20위까지 순위 횟수 비교 (Countback)
+        for (let i = 1; i <= 20; i++) {
+            const countA = a.positionCounts[i] || 0;
+            const countB = b.positionCounts[i] || 0;
+            
+            if (countA !== countB) {
+                return countB - countA; // 해당 순위를 더 많이 한 쪽이 승리
+            }
+        }
+        return 0; // 모든 기록이 똑같음 (공동 순위)
+    };
+
     if (type === 'driver') { 
-        return Object.values(pointsMap).sort((a, b) => b.points - a.points); 
+        // 드라이버: 집계된 데이터를 카운트백 로직으로 정렬하여 반환
+        return Object.values(pointsMap).sort(compareByCountback); 
     } else { 
+        // 컨스트럭터: 팀별로 포인트와 순위 기록을 합산
         let teamMap = {}; 
+        
         Object.values(pointsMap).forEach(p => { 
             if (!teamMap[p.team]) { 
-                teamMap[p.team] = { name: p.team, points: 0, driverList: [] }; 
+                teamMap[p.team] = { 
+                    name: p.team, 
+                    points: 0, 
+                    driverList: [],
+                    positionCounts: {} // 팀의 순위 기록 합산용
+                }; 
             } 
+            
+            // 팀 포인트 합산
             teamMap[p.team].points += p.points; 
+            
+            // 드라이버 목록 추가
             if (!teamMap[p.team].driverList.includes(p.name)) { 
                 teamMap[p.team].driverList.push(p.name); 
-            } 
+            }
+
+            // 팀의 순위 기록 합산 (드라이버 A의 1등 + 드라이버 B의 1등)
+            for (const [rank, count] of Object.entries(p.positionCounts)) {
+                if (!teamMap[p.team].positionCounts[rank]) {
+                    teamMap[p.team].positionCounts[rank] = 0;
+                }
+                teamMap[p.team].positionCounts[rank] += count;
+            }
         }); 
-        return Object.values(teamMap).map(t => ({ name: t.name, points: t.points, team: t.name, driverList: t.driverList })).sort((a, b) => b.points - a.points); 
+        
+        return Object.values(teamMap)
+            .map(t => ({ 
+                name: t.name, 
+                points: t.points, 
+                team: t.name, 
+                driverList: t.driverList,
+                positionCounts: t.positionCounts 
+            }))
+            .sort(compareByCountback); // 컨스트럭터도 카운트백 적용
     } 
 }
 
@@ -662,3 +731,4 @@ window.switchTab = (tabId, isFromHistory = false) => {
     
     window.scrollTo(0,0);
 };
+
