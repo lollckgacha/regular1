@@ -537,7 +537,7 @@ function renderPlayersGrid() {
                     <span class="player-name-large">${member.name}</span>
                 </div>
             </div>`;
-        }).join(''); 
+        }).join('');   
         
         htmlOutput += `<div class="team-card" style="${cardStyle}"><div class="team-name-header team-text-stroke" style="${headerStyle}">${teamName}</div><div class="team-players-row">${membersHTML}</div></div>`; 
     }); 
