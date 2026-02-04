@@ -327,7 +327,7 @@ function renderMainQuali(track, container) {
             <div class="track-info-box">
                 <span class="track-date-label">${info.date}</span>
                 <h2 class="track-name-title" style="font-size:1.4rem; margin:5px 0;">${info.name}</h2>
-                <span class="track-session-badge" style="font-size:0.8rem;">QUALIFYING</span>
+                <span class="track-session-badge" style="font-size:0.8rem;">퀄리파잉</span>
             </div>
             <div class="track-map-wrapper">
                 <img src="${info.img}" class="track-map-img" style="max-height:80px;" onerror="this.style.display='none'">
@@ -393,7 +393,7 @@ function renderMainRace(track, container) {
             <div class="track-info-box">
                 <span class="track-date-label">${info.date}</span>
                 <h2 class="track-name-title" style="font-size:1.4rem; margin:5px 0;">${info.name}</h2>
-                <span class="track-session-badge" style="font-size:0.8rem;">RACE RESULT</span>
+                <span class="track-session-badge" style="font-size:0.8rem;">레이스</span>
             </div>
             <div class="track-map-wrapper">
                 <img src="${info.img}" class="track-map-img" style="max-height:80px;" onerror="this.style.display='none'">
@@ -731,4 +731,5 @@ window.switchTab = (tabId, isFromHistory = false) => {
     
     window.scrollTo(0,0);
 };
+
 
