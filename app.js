@@ -516,15 +516,25 @@ function renderPlayersGrid() {
         const cardStyle = `background: linear-gradient(135deg, ${teamColor}dd 0%, #111 80%); border-color: ${teamColor};`; 
         const headerStyle = `color: ${teamColor}; filter: brightness(1.5);`; 
         
-        // [수정] style="border-color: ${teamColor};" 추가
-        const membersHTML = teamMembers.map(member => 
-            `<div class="player-card-box">
-                <img src="${member.img || 'images/logo.png'}" class="player-photo-large" style="border-color: ${teamColor};" onerror="this.src='images/logo.png'">
+        const membersHTML = teamMembers.map(member => {
+            // [추가 로직] 링크가 있으면 클릭 이벤트와 커서 스타일 추가
+            const hasLink = member.link && member.link.trim() !== '';
+            const clickAction = hasLink ? `onclick="window.open('${member.link}', '_blank')"` : '';
+            const cursorStyle = hasLink ? 'cursor: pointer;' : '';
+            const hoverTitle = hasLink ? `title="${member.name} 방송국 가기"` : '';
+
+            return `<div class="player-card-box">
+                <img src="${member.img || 'images/logo.png'}" 
+                     class="player-photo-large" 
+                     style="border-color: ${teamColor}; ${cursorStyle}" 
+                     ${clickAction}
+                     ${hoverTitle}
+                     onerror="this.src='images/logo.png'">
                 <div class="player-info-box">
                     <span class="player-name-large">${member.name}</span>
                 </div>
-            </div>`
-        ).join(''); 
+            </div>`;
+        }).join(''); 
         
         htmlOutput += `<div class="team-card" style="${cardStyle}"><div class="team-name-header team-text-stroke" style="${headerStyle}">${teamName}</div><div class="team-players-row">${membersHTML}</div></div>`; 
     }); 
@@ -554,4 +564,5 @@ function renderPreQuali() {
         </tr>`; 
     }).join(''); 
 }
+
 
