@@ -3,7 +3,7 @@
 // =========================================================
 
 const firebaseConfig = {
-    databaseURL: "https://dongpa2026-2fda5-default-rtdb.asia-southeast1.firebasedatabase.app"
+    databaseURL: "https://dongpa2026-2fda5-default-rtdb.asia-southeast1.firebasedatabase.app"  
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -554,3 +554,4 @@ function renderPreQuali() {
         </tr>`; 
     }).join(''); 
 }
+
