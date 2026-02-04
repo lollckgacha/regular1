@@ -139,11 +139,7 @@ nav {
     background-image: linear-gradient(45deg, transparent 0%, transparent 45%, rgba(0, 229, 188, 0.02) 50%, transparent 55%, transparent 100%);
     background-size: 10px 10px;
 }
-.f1-table tr:hover td {
-    background-color: var(--bg-hover); border-color: var(--mint-dim);
-    box-shadow: inset 0 0 15px rgba(0, 229, 188, 0.05);
-    /* transform 삭제됨 (깨짐 방지) */
-}
+
 
 /* 유틸리티 */
 .cell-left { 
@@ -156,7 +152,12 @@ nav {
 .p-avatar { 
     width: 60px; height: 60px; border-radius: 12px;
     object-fit: cover; object-position: top center;
-    background: #222; border: 2px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    background: #222;
+    
+    /* [수정] 색상은 JS에서 넣으므로 여기선 transparent(투명) 혹은 기본값 설정 */
+    border: 2px solid transparent; 
+    
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     image-rendering: auto; 
     transform: translateZ(0); backface-visibility: hidden;
 }
@@ -209,7 +210,7 @@ nav {
 }
 .track-map-wrapper { flex: 1; display: flex; justify-content: flex-end; z-index: 2; }
 .track-map-img { max-width: 280px; max-height: 160px; object-fit: contain; filter: drop-shadow(0 0 15px var(--mint-glow)); opacity: 0.8; transition: all 0.4s; }
-.track-map-img:hover { transform: scale(1.05) rotate(-2deg); opacity: 1; filter: drop-shadow(0 0 25px var(--primary-mint)); }
+
 
 .section-deco-logo { width: 180px; max-width: 40%; filter: drop-shadow(0 0 20px var(--mint-glow)); opacity: 0.8; margin-top: 20px; }
 
@@ -349,7 +350,7 @@ nav {
     background: var(--bg-card); border: 2px solid #333; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.team-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
+
 .team-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 10px); pointer-events: none; }
 .team-name-header { font-family: var(--font-main); font-size: 2rem; font-weight: 900; text-transform: uppercase; text-align: center; margin-bottom: 25px; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); position: relative; z-index: 2; }
 .team-players-row { display: flex; justify-content: space-around; align-items: flex-start; gap: 20px; position: relative; z-index: 2; }
@@ -357,17 +358,17 @@ nav {
 .player-photo-large {
     width: 130px; height: 130px;
     object-fit: cover; object-position: top center;
-    
-    /* [변경] 원형(50%) -> 둥근 사각형(20px) */
     border-radius: 20px; 
     
-    border: 4px solid rgba(255,255,255,0.1);
+    /* [수정] 색상은 JS에서 넣으므로 투명 처리 */
+    border: 4px solid transparent;
+    
     background: #222;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     margin-bottom: 15px;
     transition: all 0.3s ease;
 }
-.player-card-box:hover .player-photo-large { transform: scale(1.05); border-color: var(--text-white); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+
 .player-info-box { text-align: center; }
 .player-name-large { font-family: var(--font-main); font-size: 1.3rem; font-weight: 700; color: var(--text-white); margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 @media (max-width: 768px) {
