@@ -565,7 +565,7 @@ function renderPreQuali() {
                 <thead>
                     <tr>
                         <th width="5%">순위</th><th width="20%">드라이버</th><th width="5%">성별</th>
-                        <th width="15%">기록</th><th width="10%">차이</th><th width="15%">파트너</th><th width="10%">팀</th>
+                        <th width="15%">기록</th><th width="10%">차이</th><th width="15%">팀메이트</th><th width="10%">팀</th>
                     </tr>
                 </thead>
                 <tbody>${listHTML}</tbody>
@@ -573,6 +573,7 @@ function renderPreQuali() {
         </div>
     `;
 }
+
 
 
 
