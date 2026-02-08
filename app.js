@@ -28,14 +28,14 @@ const TRACK_ORDER = ["레드불링", "상파울루", "라스베가스", "아부�
 const DEFAULT_COLORS = { "FER": "#E8002D", "MCL": "#FF8700", "RBR": "#3671C6", "MER": "#27F4D2", "AMR": "#229971", "ALP": "#0093CC", "WIL": "#64C4FF", "VCARB": "#6692FF", "KICK": "#52E252", "HAS": "#B6BABD", "FA": "#555555" };
 const DEFAULT_TEAM_COLOR = "#555555";
 
-// [설정] 트랙별 정보 및 일정 (국기 제거됨)
+// [설정] 트랙별 정보 및 일정 (랩 수 추가됨)
 const TRACK_INFO = {
-    "레드불링": { img: "images/tracks/redbull.webp", name: "레드불링", date: "2026.02.14 (토) 19:00" },
-    "상파울루": { img: "images/tracks/brazil.webp", name: "상파울루", date: "2026.02.14 (토) 19:00" },
-    "라스베가스": { img: "images/tracks/vegas.webp", name: "라스베가스", date: "2026.02.15 (일) 19:00" },
-    "아부다비": { img: "images/tracks/abudhabi.webp", name: "아부다비", date: "2026.02.15 (일) 19:00" }
+    "레드불링": { img: "images/tracks/redbull.webp", name: "레드불링", date: "2026.02.14 (토) 19:00", laps: "36 LAPS" },
+    "상파울루": { img: "images/tracks/brazil.webp", name: "상파울루", date: "2026.02.14 (토) 19:00", laps: "36 LAPS" },
+    "라스베가스": { img: "images/tracks/vegas.webp", name: "라스베가스", date: "2026.02.15 (일) 19:00", laps: "25 LAPS" },
+    "아부다비": { img: "images/tracks/abudhabi.webp", name: "아부다비", date: "2026.02.15 (일) 19:00", laps: "29 LAPS" }
 };
-const DEFAULT_TRACK = { img: "images/logo.png", name: "UNKNOWN TRACK", date: "TBA" };
+const DEFAULT_TRACK = { img: "images/logo.png", name: "UNKNOWN TRACK", date: "TBA", laps: "- LAPS" };
 
 // [설정] 예선 일정
 const PRE_QUALI_DATE = "2026.02.11 (수) 18:00";
@@ -223,7 +223,7 @@ function renderPreQuali() {
 
 
 // =========================================================
-// [탭] 본선 (MAIN EVENT) - 2단 분할
+// [탭] 본선 (MAIN EVENT) - 2단 분할 & 랩 수 표시
 // =========================================================
 function setupMainTabs() {
     const qTracks = Object.keys(appData.mainQuali || {});
@@ -352,7 +352,7 @@ function renderMainQuali(track, container) {
     container.innerHTML = html;
 }
 
-// 본선 레이스
+// 본선 레이스 (랩 수 표기 추가됨)
 function renderMainRace(track, container) {
     const listData = appData.mainRace[track] || [];
     const info = TRACK_INFO[track] || { ...DEFAULT_TRACK, name: track, date: "TBA" };
@@ -388,12 +388,16 @@ function renderMainRace(track, container) {
 
     const tableHeader = `<thead><tr><th>순위</th><th>드라이버</th><th>성별</th><th>상태</th><th>팀</th><th>기록</th><th>페널티</th><th>차이</th><th>PT</th><th>누적</th><th>그리드</th></tr></thead>`;
 
+    // 랩 수 표시 추가된 HTML
     const html = `
         <div class="track-header-card" style="padding:15px; margin-bottom:15px; min-height:auto;">
             <div class="track-info-box">
                 <span class="track-date-label">${info.date}</span>
                 <h2 class="track-name-title" style="font-size:1.4rem; margin:5px 0;">${info.name}</h2>
-                <span class="track-session-badge" style="font-size:0.8rem;">레이스</span>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <span class="track-session-badge" style="font-size:0.8rem;">레이스</span>
+                    <span class="track-session-badge" style="font-size:0.8rem; background:transparent; border:1px solid var(--primary-mint); color:var(--primary-mint); box-shadow:none;">${info.laps}</span>
+                </div>
             </div>
             <div class="track-map-wrapper">
                 <img src="${info.img}" class="track-map-img" style="max-height:80px;" onerror="this.style.display='none'">
@@ -420,7 +424,7 @@ function renderMainRace(track, container) {
 
 
 // =========================================================
-// [탭] 종합 순위 (STANDINGS) - 2단 분할 적용 (오류 수정됨)
+// [탭] 종합 순위 (STANDINGS) - 카운트백 로직 적용
 // =========================================================
 
 window.setStandingsType = (type) => { 
@@ -458,10 +462,9 @@ function renderStandings() {
         prevData = calculatePointsUntil(targetIdx - 1, currentStandingsView.type); 
     } 
 
-    // [핵심 변경] 타입에 따라 분할 개수와 스타일 클래스 결정
     const isConstructor = (currentStandingsView.type === 'constructor');
-    const splitCount = isConstructor ? 5 : 10; // 컨스트럭터는 5개씩, 드라이버는 10개씩
-    const tableClass = isConstructor ? "compact-table large-mode" : "compact-table"; // 컨스트럭터는 큰 테이블 사용
+    const splitCount = isConstructor ? 5 : 10; 
+    const tableClass = isConstructor ? "compact-table large-mode" : "compact-table"; 
 
     const leftData = currentData.slice(0, splitCount);
     const rightData = currentData.slice(splitCount);
@@ -545,21 +548,17 @@ function calculatePointsUntil(roundIdx, type) {
         if (!appData.mainRace[trackName]) continue; 
         
         appData.mainRace[trackName].forEach(r => { 
-            // 드라이버 기초 데이터 생성
             if (!pointsMap[r.name]) { 
                 pointsMap[r.name] = { 
                     points: 0, 
                     team: r.team || 'FA', 
                     name: r.name,
-                    // 순위별 횟수 저장을 위한 객체 (예: {1: 2, 2: 0, 3: 1 ...})
                     positionCounts: {} 
                 }; 
             } 
             
-            // 포인트 합산
             pointsMap[r.name].points += (r.points || 0);
             
-            // 순위 횟수 카운트 (DNF가 아닌 경우만)
             const rank = parseInt(r.rank);
             if (!isNaN(rank)) {
                 if (!pointsMap[r.name].positionCounts[rank]) {
@@ -572,49 +571,36 @@ function calculatePointsUntil(roundIdx, type) {
     
     // [공통] 카운트백 정렬 함수 (포인트 -> 1위횟수 -> 2위횟수 ... 순 비교)
     const compareByCountback = (a, b) => {
-        // 1. 포인트 우선 비교
         if (b.points !== a.points) {
             return b.points - a.points; 
         }
-
-        // 2. 포인트가 같으면 1위부터 20위까지 순위 횟수 비교 (Countback)
         for (let i = 1; i <= 20; i++) {
             const countA = a.positionCounts[i] || 0;
             const countB = b.positionCounts[i] || 0;
-            
             if (countA !== countB) {
-                return countB - countA; // 해당 순위를 더 많이 한 쪽이 승리
+                return countB - countA; 
             }
         }
-        return 0; // 모든 기록이 똑같음 (공동 순위)
+        return 0; 
     };
 
     if (type === 'driver') { 
-        // 드라이버: 집계된 데이터를 카운트백 로직으로 정렬하여 반환
         return Object.values(pointsMap).sort(compareByCountback); 
     } else { 
-        // 컨스트럭터: 팀별로 포인트와 순위 기록을 합산
         let teamMap = {}; 
-        
         Object.values(pointsMap).forEach(p => { 
             if (!teamMap[p.team]) { 
                 teamMap[p.team] = { 
                     name: p.team, 
                     points: 0, 
                     driverList: [],
-                    positionCounts: {} // 팀의 순위 기록 합산용
+                    positionCounts: {} 
                 }; 
             } 
-            
-            // 팀 포인트 합산
             teamMap[p.team].points += p.points; 
-            
-            // 드라이버 목록 추가
             if (!teamMap[p.team].driverList.includes(p.name)) { 
                 teamMap[p.team].driverList.push(p.name); 
             }
-
-            // 팀의 순위 기록 합산 (드라이버 A의 1등 + 드라이버 B의 1등)
             for (const [rank, count] of Object.entries(p.positionCounts)) {
                 if (!teamMap[p.team].positionCounts[rank]) {
                     teamMap[p.team].positionCounts[rank] = 0;
@@ -631,7 +617,7 @@ function calculatePointsUntil(roundIdx, type) {
                 driverList: t.driverList,
                 positionCounts: t.positionCounts 
             }))
-            .sort(compareByCountback); // 컨스트럭터도 카운트백 적용
+            .sort(compareByCountback); 
     } 
 }
 
@@ -649,7 +635,6 @@ function renderPodium() {
     
     if (!driverContainer || !constContainer) return; 
     
-    // 현재까지 진행된 라운드 인덱스 계산
     const lastRoundIdx = TRACK_ORDER.length - 1; 
     let validIdx = -1; 
     for(let i=0; i<=lastRoundIdx; i++) { 
@@ -662,16 +647,14 @@ function renderPodium() {
         return; 
     } 
     
-    // 1. 드라이버 데이터 계산 및 렌더링
     const driverData = calculatePointsUntil(validIdx, 'driver').slice(0, 3); 
     driverContainer.innerHTML = generatePodiumHTML(driverData, 'driver');
 
-    // 2. 컨스트럭터 데이터 계산 및 렌더링
     const constData = calculatePointsUntil(validIdx, 'constructor').slice(0, 3); 
     constContainer.innerHTML = generatePodiumHTML(constData, 'constructor');
 }
 
-// [보조 함수] 포디움 HTML 생성기
+// [보조 함수] 포디움 HTML 생성기 (컨스트럭터 50:50 적용)
 function generatePodiumHTML(dataList, type) {
     if (dataList.length === 0) return '<p style="color:#888;">데이터 없음</p>';
 
@@ -681,13 +664,10 @@ function generatePodiumHTML(dataList, type) {
         let imgHTML = ''; 
         
         if (type === 'driver') { 
-            // 드라이버: 기존 원형/사각형 유지
             imgHTML = `<img src="${getPlayerImg(d.name)}" class="podium-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`; 
         } else { 
-            // [수정] 컨스트럭터: 박스에 테두리 색상을 주고, 이미지는 꽉 채움
+            // 컨스트럭터: 테두리 박스에 이미지 꽉 채움
             const duoHTML = d.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="podium-duo-img" onerror="this.src='images/logo.png'">`).join(''); 
-            
-            // 박스 자체에 테두리 색상 적용
             imgHTML = `<div class="podium-duo-box" style="border-color:${tColor};">${duoHTML}</div>`; 
         } 
         
@@ -731,5 +711,3 @@ window.switchTab = (tabId, isFromHistory = false) => {
     
     window.scrollTo(0,0);
 };
-
-
