@@ -661,26 +661,39 @@ function generatePodiumHTML(dataList, type) {
     const createCard = (d, rankClass, rankNum) => { 
         if (!d) return ''; 
         const tColor = getTeamColor(d.team); 
-        let imgHTML = ''; 
         
+        let imgHTML = ''; 
+        // [수정 포인트 1] 이름 출력용 변수 생성 (기본값: 이름 표시)
+        let nameHTML = `<div class="podium-name">${d.name}</div>`; 
+
         if (type === 'driver') { 
+            // 드라이버: 기존 유지
             imgHTML = `<img src="${getPlayerImg(d.name)}" class="podium-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`; 
         } else { 
-            // 컨스트럭터: 테두리 박스에 이미지 꽉 채움
+            // 컨스트럭터: 이미지 꽉 채움
             const duoHTML = d.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="podium-duo-img" onerror="this.src='images/logo.png'">`).join(''); 
             imgHTML = `<div class="podium-duo-box" style="border-color:${tColor};">${duoHTML}</div>`; 
+            
+            // [수정 포인트 2] 컨스트럭터일 때는 흰색 이름을 지워서 중복 방지
+            nameHTML = ''; 
         } 
         
         return `<div class="podium-card ${rankClass}" style="border-bottom-color:${tColor};">
             <div class="podium-rank">${rankNum}</div>
             ${imgHTML}
             <div class="podium-info-wrap" style="text-align:center; width:100%;">
-                <div class="podium-name">${d.name}</div>
-                <div class="podium-team team-text-stroke" style="color:${tColor};">${d.team}</div>
+                ${nameHTML} <div class="podium-team team-text-stroke" style="color:${tColor};">${d.team}</div>
                 <div class="podium-points">${d.points} PT</div>
             </div>
         </div>`; 
     }; 
+
+    return `<div class="podium-container compact-podium" style="min-height:auto; margin-top:0;">
+        ${createCard(dataList[1], 'p-2nd', 2)}
+        ${createCard(dataList[0], 'p-1st', 1)}
+        ${createCard(dataList[2], 'p-3rd', 3)}
+    </div>`;
+}
 
     return `<div class="podium-container compact-podium" style="min-height:auto; margin-top:0;">
         ${createCard(dataList[1], 'p-2nd', 2)}
@@ -711,3 +724,4 @@ window.switchTab = (tabId, isFromHistory = false) => {
     
     window.scrollTo(0,0);
 };
+
