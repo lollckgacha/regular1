@@ -28,7 +28,7 @@ const TRACK_ORDER = ["레드불링", "상파울루", "라스베가스", "아부�
 const DEFAULT_COLORS = { "FER": "#E8002D", "MCL": "#FF8700", "RBR": "#3671C6", "MER": "#27F4D2", "AMR": "#229971", "ALP": "#0093CC", "WIL": "#64C4FF", "VCARB": "#6692FF", "KICK": "#52E252", "HAS": "#B6BABD", "FA": "#555555" };
 const DEFAULT_TEAM_COLOR = "#555555";
 
-// [설정] 트랙별 정보 및 일정 (랩 수 추가됨)
+// [설정] 트랙별 정보 및 일정 (랩 수 수정됨)
 const TRACK_INFO = {
     "레드불링": { img: "images/tracks/redbull.webp", name: "레드불링", date: "2026.02.14 (토) 19:00", laps: "36 LAPS" },
     "상파울루": { img: "images/tracks/brazil.webp", name: "상파울루", date: "2026.02.14 (토) 19:00", laps: "36 LAPS" },
@@ -97,7 +97,7 @@ function getPlayerImg(name) {
 }
 
 // =========================================================
-// [탭] 참가자 (PLAYERS) - 디자인 최적화
+// [탭] 참가자 (PLAYERS)
 // =========================================================
 function renderPlayersGrid() { 
     const gridContainer = document.getElementById('players-grid'); 
@@ -157,7 +157,7 @@ function renderPlayersGrid() {
 
 
 // =========================================================
-// [탭] 예선 (PRE-QUALI) - 2단 분할
+// [탭] 예선 (PRE-QUALI)
 // =========================================================
 function renderPreQuali() { 
     const container = document.getElementById('view-pre-quali'); 
@@ -223,7 +223,7 @@ function renderPreQuali() {
 
 
 // =========================================================
-// [탭] 본선 (MAIN EVENT) - 2단 분할 & 랩 수 표시
+// [탭] 본선 (MAIN EVENT)
 // =========================================================
 function setupMainTabs() {
     const qTracks = Object.keys(appData.mainQuali || {});
@@ -424,7 +424,7 @@ function renderMainRace(track, container) {
 
 
 // =========================================================
-// [탭] 종합 순위 (STANDINGS) - 카운트백 로직 적용
+// [탭] 종합 순위 (STANDINGS)
 // =========================================================
 
 window.setStandingsType = (type) => { 
@@ -654,28 +654,31 @@ function renderPodium() {
     constContainer.innerHTML = generatePodiumHTML(constData, 'constructor');
 }
 
-// [보조 함수] 포디움 HTML 생성기 (컨스트럭터 50:50 적용)
+// [보조 함수] 포디움 HTML 생성기 (컨스트럭터 이름 중복 제거 + 50:50 적용)
 function generatePodiumHTML(dataList, type) {
     if (dataList.length === 0) return '<p style="color:#888;">데이터 없음</p>';
 
     const createCard = (d, rankClass, rankNum) => { 
         if (!d) return ''; 
         const tColor = getTeamColor(d.team); 
-        let imgHTML = ''; 
         
+        let imgHTML = ''; 
+        let nameHTML = `<div class="podium-name">${d.name}</div>`; 
+
         if (type === 'driver') { 
             imgHTML = `<img src="${getPlayerImg(d.name)}" class="podium-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`; 
         } else { 
-            // 컨스트럭터: 테두리 박스에 이미지 꽉 채움
+            // 컨스트럭터: 이미지 꽉 채움 + 이름 제거
             const duoHTML = d.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="podium-duo-img" onerror="this.src='images/logo.png'">`).join(''); 
             imgHTML = `<div class="podium-duo-box" style="border-color:${tColor};">${duoHTML}</div>`; 
+            nameHTML = ''; 
         } 
         
         return `<div class="podium-card ${rankClass}" style="border-bottom-color:${tColor};">
             <div class="podium-rank">${rankNum}</div>
             ${imgHTML}
             <div class="podium-info-wrap" style="text-align:center; width:100%;">
-                <div class="podium-name">${d.name}</div>
+                ${nameHTML}
                 <div class="podium-team team-text-stroke" style="color:${tColor};">${d.team}</div>
                 <div class="podium-points">${d.points} PT</div>
             </div>
