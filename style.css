@@ -462,3 +462,32 @@ nav {
     .team-name-header { font-size: 1.6rem; }
     .player-photo-large { width: 120px; height: 120px; }
 }
+
+/* =========================================
+   [추가] 본선 레이스 테이블 겹침 해결
+   ========================================= */
+@media (min-width: 1200px) {
+    /* 레이스 테이블 전용 너비 설정 */
+    .race-table th:nth-child(1), .race-table td:nth-child(1) { width: 5%; }  /* 순위 */
+    .race-table th:nth-child(2), .race-table td:nth-child(2) { width: 23%; } /* 드라이버 (이름) - 넓게 */
+    .race-table th:nth-child(3), .race-table td:nth-child(3) { width: 6%; }  /* 성별 */
+    .race-table th:nth-child(4), .race-table td:nth-child(4) { width: 7%; }  /* 상태 */
+    .race-table th:nth-child(5), .race-table td:nth-child(5) { width: 14%; } /* 팀 - 넓게 */
+    .race-table th:nth-child(6), .race-table td:nth-child(6) { width: 14%; } /* 기록 - 넓게 */
+    .race-table th:nth-child(7), .race-table td:nth-child(7) { width: 7%; }  /* 페널티 */
+    .race-table th:nth-child(8), .race-table td:nth-child(8) { width: 8%; }  /* 차이 */
+    .race-table th:nth-child(9), .race-table td:nth-child(9) { width: 6%; }  /* PT */
+    .race-table th:nth-child(10), .race-table td:nth-child(10) { width: 5%; } /* 누적 */
+    .race-table th:nth-child(11), .race-table td:nth-child(11) { width: 5%; } /* 그리드 */
+}
+
+.compact-table:not(.large-mode) th:nth-child(2) {
+    /* 기존 8px -> 55px로 변경하여 사진 너비만큼 건너뜀 */
+    padding-left: 55px !important; 
+    text-align: left;
+}
+
+/* (참고) 컨스트럭터 테이블은 이름만 있으므로 기존 유지 */
+.compact-table.large-mode th:nth-child(2) {
+    padding-left: 15px !important;
+}
