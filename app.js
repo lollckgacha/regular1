@@ -109,6 +109,7 @@ function renderPlayersGrid() {
         return; 
     } 
     
+    // 팀별 그룹화
     const teamsMap = {}; 
     playersList.forEach(p => { 
         if (!p.team) p.team = "FA"; 
@@ -116,10 +117,11 @@ function renderPlayersGrid() {
         teamsMap[p.team].push(p); 
     }); 
     
+    // 팀 정렬
     const sortedTeamNames = Object.keys(teamsMap).sort((a, b) => { 
         const idxA = TEAM_ORDER_LIST.indexOf(a);
         const idxB = TEAM_ORDER_LIST.indexOf(b);
-        if (a === 'FA') return 1;
+        if (a === 'FA') return 1; // FA는 항상 마지막에 배치
         if (b === 'FA') return -1;
         if (idxA === -1 && idxB === -1) return a.localeCompare(b);
         if (idxA === -1) return 1;
@@ -131,17 +133,28 @@ function renderPlayersGrid() {
     sortedTeamNames.forEach(teamName => { 
         const teamMembers = teamsMap[teamName]; 
         const teamColor = getTeamColor(teamName); 
-        
-        const cardStyle = `background: linear-gradient(135deg, ${teamColor}dd 0%, #111 80%); border-color: ${teamColor};`; 
+        const isFA = (teamName === 'FA'); // FA 여부 확인
+
+        // [수정 1] FA일 경우 카드 너비를 100%로 설정, 아니면 기존 스타일 유지
+        let cardStyle = `background: linear-gradient(135deg, ${teamColor}dd 0%, #111 80%); border-color: ${teamColor};`; 
+        if (isFA) cardStyle += ` width: 100%;`; 
+
         const headerStyle = `color: ${teamColor}; filter: brightness(1.5);`; 
         
+        // [수정 2] FA일 경우 줄바꿈(wrap) 허용 및 간격 조정
+        let rowStyle = '';
+        if (isFA) rowStyle = `flex-wrap: wrap; gap: 30px; justify-content: center;`;
+
         const membersHTML = teamMembers.map(member => {
             const imgHTML = `<img src="${member.img || 'images/logo.png'}" class="player-photo-large" style="border-color: ${teamColor};" onerror="this.src='images/logo.png'">`;
             const contentHTML = member.url 
                 ? `<a href="${member.url}" target="_blank" class="player-img-wrapper">${imgHTML}</a>`
                 : `<div class="player-img-wrapper">${imgHTML}</div>`;
 
-            return `<div class="player-card-box">
+            // [수정 3] FA일 경우 선수 박스 크기를 조정 (너무 커지지 않도록)
+            const boxStyle = isFA ? `width: 12%; min-width: 140px;` : ``;
+
+            return `<div class="player-card-box" style="${boxStyle}">
                 ${contentHTML}
                 <div class="player-info-box">
                     <span class="player-name-large">${member.name}</span>
@@ -149,12 +162,14 @@ function renderPlayersGrid() {
             </div>`;
         }).join(''); 
         
-        htmlOutput += `<div class="team-card" style="${cardStyle}"><div class="team-name-header team-text-stroke" style="${headerStyle}">${teamName}</div><div class="team-players-row">${membersHTML}</div></div>`; 
+        htmlOutput += `<div class="team-card" style="${cardStyle}">
+            <div class="team-name-header team-text-stroke" style="${headerStyle}">${teamName}</div>
+            <div class="team-players-row" style="${rowStyle}">${membersHTML}</div>
+        </div>`; 
     }); 
     
     gridContainer.innerHTML = htmlOutput; 
 }
-
 
 // =========================================================
 // [탭] 예선 (PRE-QUALI)
@@ -713,3 +728,4 @@ window.switchTab = (tabId, isFromHistory = false) => {
     
     window.scrollTo(0,0);
 };
+
