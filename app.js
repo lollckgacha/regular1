@@ -368,7 +368,7 @@ function renderMainRace(track, container) {
             const tColor = getTeamColor(p.team);
             
             return `<tr>
-                <td width="8%" class="text-center"><span class="rank-num rank-${p.rank}">${p.rank}</span></td>
+                <td class="text-center"><span class="rank-num rank-${p.rank}">${p.rank}</span></td>
                 <td><div class="cell-left">
                     <img src="${p.img || 'images/logo.png'}" class="p-avatar" style="border-color: ${tColor};" onerror="this.src='images/logo.png'">
                     <span style="font-weight:bold;">${p.name}</span>
@@ -388,7 +388,6 @@ function renderMainRace(track, container) {
 
     const tableHeader = `<thead><tr><th>순위</th><th>드라이버</th><th>성별</th><th>상태</th><th>팀</th><th>기록</th><th>페널티</th><th>차이</th><th>PT</th><th>누적</th><th>그리드</th></tr></thead>`;
 
-    // 랩 수 표시 추가된 HTML
     const html = `
         <div class="track-header-card" style="padding:15px; margin-bottom:15px; min-height:auto;">
             <div class="track-info-box">
@@ -406,13 +405,13 @@ function renderMainRace(track, container) {
         
         <div class="split-layout-container">
             <div class="split-table-box">
-                <table class="compact-table">
+                <table class="compact-table race-table">
                     ${tableHeader}
                     <tbody>${listData.length === 0 ? '<tr><td colspan="11">데이터 없음</td></tr>' : createRows(leftData)}</tbody>
                 </table>
             </div>
             <div class="split-table-box">
-                <table class="compact-table">
+                <table class="compact-table race-table">
                     ${tableHeader}
                     <tbody>${createRows(rightData)}</tbody>
                 </table>
