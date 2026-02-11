@@ -28,7 +28,7 @@ const TRACK_ORDER = ["레드불링", "상파울루", "라스베가스", "아부�
 const DEFAULT_COLORS = { "FER": "#E8002D", "MCL": "#FF8700", "RBR": "#3671C6", "MER": "#27F4D2", "AMR": "#229971", "ALP": "#0093CC", "WIL": "#64C4FF", "VCARB": "#6692FF", "KICK": "#52E252", "HAS": "#B6BABD", "FA": "#555555" };
 const DEFAULT_TEAM_COLOR = "#555555";
 
-// [설정] 트랙별 정보 및 일정 (랩 수 추가됨)
+// [설정] 트랙별 정보 및 일정 (랩 수 수정됨)
 const TRACK_INFO = {
     "레드불링": { img: "images/tracks/redbull.webp", name: "레드불링", date: "2026.02.14 (토) 19:00", laps: "36 LAPS" },
     "상파울루": { img: "images/tracks/brazil.webp", name: "상파울루", date: "2026.02.14 (토) 19:00", laps: "36 LAPS" },
@@ -97,7 +97,7 @@ function getPlayerImg(name) {
 }
 
 // =========================================================
-// [탭] 참가자 (PLAYERS) - 디자인 최적화
+// [탭] 참가자 (PLAYERS)
 // =========================================================
 function renderPlayersGrid() { 
     const gridContainer = document.getElementById('players-grid'); 
@@ -157,7 +157,7 @@ function renderPlayersGrid() {
 
 
 // =========================================================
-// [탭] 예선 (PRE-QUALI) - 2단 분할
+// [탭] 예선 (PRE-QUALI)
 // =========================================================
 function renderPreQuali() { 
     const container = document.getElementById('view-pre-quali'); 
@@ -223,7 +223,7 @@ function renderPreQuali() {
 
 
 // =========================================================
-// [탭] 본선 (MAIN EVENT) - 2단 분할 & 랩 수 표시
+// [탭] 본선 (MAIN EVENT)
 // =========================================================
 function setupMainTabs() {
     const qTracks = Object.keys(appData.mainQuali || {});
@@ -352,7 +352,7 @@ function renderMainQuali(track, container) {
     container.innerHTML = html;
 }
 
-// 본선 레이스 (랩 수 표기 추가됨)
+// 본선 레이스
 function renderMainRace(track, container) {
     const listData = appData.mainRace[track] || [];
     const info = TRACK_INFO[track] || { ...DEFAULT_TRACK, name: track, date: "TBA" };
@@ -388,7 +388,6 @@ function renderMainRace(track, container) {
 
     const tableHeader = `<thead><tr><th>순위</th><th>드라이버</th><th>성별</th><th>상태</th><th>팀</th><th>기록</th><th>페널티</th><th>차이</th><th>PT</th><th>누적</th><th>그리드</th></tr></thead>`;
 
-    // 랩 수 표시 추가된 HTML
     const html = `
         <div class="track-header-card" style="padding:15px; margin-bottom:15px; min-height:auto;">
             <div class="track-info-box">
@@ -424,7 +423,7 @@ function renderMainRace(track, container) {
 
 
 // =========================================================
-// [탭] 종합 순위 (STANDINGS) - 카운트백 로직 적용
+// [탭] 종합 순위 (STANDINGS)
 // =========================================================
 
 window.setStandingsType = (type) => { 
@@ -654,46 +653,35 @@ function renderPodium() {
     constContainer.innerHTML = generatePodiumHTML(constData, 'constructor');
 }
 
-// [보조 함수] 포디움 HTML 생성기 (컨스트럭터 50:50 적용)
+// [보조 함수] 포디움 HTML 생성기 (컨스트럭터 이름 중복 제거)
 function generatePodiumHTML(dataList, type) {
     if (dataList.length === 0) return '<p style="color:#888;">데이터 없음</p>';
 
     const createCard = (d, rankClass, rankNum) => { 
         if (!d) return ''; 
         const tColor = getTeamColor(d.team); 
-        
         let imgHTML = ''; 
-        // [수정 포인트 1] 이름 출력용 변수 생성 (기본값: 이름 표시)
-        let nameHTML = `<div class="podium-name">${d.name}</div>`; 
+        let nameHTML = `<div class="podium-name">${d.name}</div>`; // 기본: 드라이버 이름
 
         if (type === 'driver') { 
-            // 드라이버: 기존 유지
             imgHTML = `<img src="${getPlayerImg(d.name)}" class="podium-img" onerror="this.src='images/logo.png'" style="border-color:${tColor}">`; 
         } else { 
-            // 컨스트럭터: 이미지 꽉 채움
+            // 컨스트럭터: 이미지 꽉 채움 + 이름 제거
             const duoHTML = d.driverList.map(dName => `<img src="${getPlayerImg(dName)}" class="podium-duo-img" onerror="this.src='images/logo.png'">`).join(''); 
             imgHTML = `<div class="podium-duo-box" style="border-color:${tColor};">${duoHTML}</div>`; 
-            
-            // [수정 포인트 2] 컨스트럭터일 때는 흰색 이름을 지워서 중복 방지
-            nameHTML = ''; 
+            nameHTML = ''; // 중복된 흰색 이름 제거
         } 
         
         return `<div class="podium-card ${rankClass}" style="border-bottom-color:${tColor};">
             <div class="podium-rank">${rankNum}</div>
             ${imgHTML}
             <div class="podium-info-wrap" style="text-align:center; width:100%;">
-                ${nameHTML} <div class="podium-team team-text-stroke" style="color:${tColor};">${d.team}</div>
+                ${nameHTML}
+                <div class="podium-team team-text-stroke" style="color:${tColor};">${d.team}</div>
                 <div class="podium-points">${d.points} PT</div>
             </div>
         </div>`; 
     }; 
-
-    return `<div class="podium-container compact-podium" style="min-height:auto; margin-top:0;">
-        ${createCard(dataList[1], 'p-2nd', 2)}
-        ${createCard(dataList[0], 'p-1st', 1)}
-        ${createCard(dataList[2], 'p-3rd', 3)}
-    </div>`;
-}
 
     return `<div class="podium-container compact-podium" style="min-height:auto; margin-top:0;">
         ${createCard(dataList[1], 'p-2nd', 2)}
@@ -724,4 +712,3 @@ window.switchTab = (tabId, isFromHistory = false) => {
     
     window.scrollTo(0,0);
 };
-
